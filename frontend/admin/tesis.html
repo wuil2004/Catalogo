@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Trabajos de Titulación</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/styles.css">
+    <link rel="stylesheet" href="/admin/css/tesis.css">
+</head>
+<body>
+    <!-- Barra de navegación superior -->
+    <header class="top-navbar">
+        <div class="navbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="breadcrumbs">
+                <span>Panel de Administración</span> / <strong>Trabajos de Titulación</strong>
+            </div>
+        </div>
+        <div class="navbar-right">
+            <div class="user-dropdown">
+                <div class="user-info">
+                    <span class="user-name">Administrador</span>
+                    <span class="user-status active">En línea</span>
+                </div>
+                <img src="/admin/assets/images.png" alt="Usuario" class="user-avatar">
+                <div class="dropdown-menu">
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/admin/assets/images.png" alt="Logo">
+                <span>Admin Panel</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="tesis.html"><i class="fas fa-graduation-cap"></i> Trabajos de titulación</a></li>
+                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> Administradores</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1><i class="fas fa-graduation-cap"></i> Trabajos de Titulación</h1>
+                <div class="page-actions">
+                    <div class="view-toggle">
+                        <button id="tableViewBtn" class="active" title="Vista de tabla">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button id="cardViewBtn" title="Vista de tarjetas">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Trabajo
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por título, estudiante...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="carreraFilter">Carrera:</label>
+                    <select id="carreraFilter">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="fechaFilter">Año:</label>
+                    <select id="fechaFilter">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                
+                <button id="resetFilters" class="btn btn-outline">
+                    <i class="fas fa-undo"></i> Limpiar
+                </button>
+                
+                <button id="advancedFilterBtn" class="btn btn-outline">
+                    <i class="fas fa-filter"></i> Avanzados
+                </button>
+            </div>
+
+            <!-- Vista de tabla -->
+            <div class="registros-container">
+                <div class="table-responsive">
+                    <table class="registros-table">
+                        <colgroup>
+                            <col class="column-numero priority-1">
+                            <col class="column-codigo priority-1">
+                            <col class="column-carrera">
+                            <col class="column-estudiante">
+                            <col class="column-cuenta">
+                            <col class="column-estudiante">
+                            <col class="column-cuenta">
+                            <col class="column-estudiante">
+                            <col class="column-cuenta">
+                            <col class="column-opcion">
+                            <col class="column-titulo priority-1">
+                            <col class="column-fecha">
+                            <col class="column-color">
+                            <col class="column-imagen">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>N° Reg.</th>
+                                <th>Código</th>
+                                <th>Carrera</th>
+                                <th>Estudiante 1</th>
+                                <th>Cuenta 1</th>
+                                <th>Estudiante 2</th>
+                                <th>Cuenta 2</th>
+                                <th>Estudiante 3</th>
+                                <th>Cuenta 3</th>
+                                <th>Opción</th>
+                                <th>Título</th>
+                                <th>Fecha</th>
+                                <th>Color</th>
+                                <th>Imagen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registros-body">
+                            <!-- Los registros se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                <div class="table-footer">
+                    <div class="table-info">
+                        Mostrando <span id="startItem">1</span>-<span id="endItem">10</span> de <span id="totalItems">0</span> registros
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn" id="firstPage" disabled><i class="fas fa-angle-double-left"></i></button>
+                        <button class="page-btn" id="prevPage" disabled><i class="fas fa-angle-left"></i></button>
+                        <div class="page-numbers">
+                            <button class="page-btn active">1</button>
+                        </div>
+                        <button class="page-btn" id="nextPage"><i class="fas fa-angle-right"></i></button>
+                        <button class="page-btn" id="lastPage"><i class="fas fa-angle-double-right"></i></button>
+                    </div>
+                    <div class="page-size">
+                        <select id="itemsPerPage">
+                            <option value="10">10 por página</option>
+                            <option value="25">25 por página</option>
+                            <option value="50">50 por página</option>
+                            <option value="100">100 por página</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista de tarjetas (oculta inicialmente) -->
+            <div id="cardsViewContainer" class="cards-container" style="display: none;">
+                <!-- Las tarjetas se generarán dinámicamente aquí -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para texto completo -->
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <div class="full-text-content" id="modalText"></div>
+        </div>
+    </div>
+
+    <!-- Modal para imagen completa -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title">Imagen del Trabajo</h3>
+            <div id="modalImageContainer"></div>
+            <div style="margin-top: 15px;">
+                <a id="imageDownloadLink" href="#" target="_blank" style="color: #06c;">Abrir en nueva pestaña</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles de tarjeta -->
+    <div id="cardDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title" id="cardDetailsTitle"></h3>
+            <div class="card-details-container">
+                <div class="card-details-image" id="cardDetailsImage">
+                    <span class="no-image">Sin imagen</span>
+                </div>
+                <div class="card-details-content">
+                    <div class="details-row">
+                        <span class="details-label">N° Registro:</span>
+                        <span class="details-value" id="cardDetailsRegistro"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Código:</span>
+                        <span class="details-value" id="cardDetailsCode"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Carrera:</span>
+                        <span class="details-value" id="cardDetailsCareer"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Opción:</span>
+                        <span class="details-value" id="cardDetailsOption"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Fecha:</span>
+                        <span class="details-value" id="cardDetailsDate"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Color:</span>
+                        <span class="details-value" id="cardDetailsColor"></span>
+                    </div>
+                    <h4 class="details-section-title">Estudiantes</h4>
+                    <div class="details-students" id="cardDetailsStudents"></div>
+                    <h4 class="details-section-title">Números de Cuenta</h4>
+                    <div class="details-accounts" id="cardDetailsAccounts"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Cargando...</div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/tesis.js"></script>
+</body>
+</html>

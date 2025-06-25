@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administradores</title>
+    <link rel="stylesheet" href="/admin/css/styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">Admin Panel</div>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="tesis.html">Trabajos de titulacion</a></li>
+                    <li class="active"><a href="admins.html">Administradores</a></li>
+                    <li><a href="#" id="logoutBtn">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>Administradores</h1>
+                <div class="user-info">
+                    <span id="currentUser"></span>
+                    <button id="addAdminBtn" class="btn btn-primary">+ Nuevo Admin</button>
+                </div>
+            </header>
+            <div class="content">
+                <div id="loadingMessage" class="loading-message">Cargando administradores...</div>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <div class="table-container">
+                    <table id="adminsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos cargados por JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para agregar/editar admin -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Nuevo Administrador</h2>
+            <form id="adminForm">
+                <input type="hidden" id="adminId">
+                <div class="form-group">
+                    <label for="adminUsername">Usuario</label>
+                    <input type="text" id="adminUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Contraseña</label>
+                    <input type="password" id="adminPassword" required>
+                    <small class="form-text">(Obligatoria para nuevos, opcional para editar)</small>
+                </div>
+                <div id="formError" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>

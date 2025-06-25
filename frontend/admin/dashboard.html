@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="/admin/css/styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">Admin Panel</div>
+            <nav>
+                <ul>
+                    <li class="active"><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="tesis.html">Trabajos de titulacion</a></li>
+                    <li><a href="admins.html">Administradores</a></li>
+                    <li><a href="#" id="logoutBtn">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <span id="currentUser"></span>
+                </div>
+            </header>
+            <div class="content">
+                <div class="card">
+                    <h2>Resumen del Sistema</h2>
+                    <p>Bienvenido al panel de administración. Seleccione una opción del menú para comenzar.</p>
+                    <div id="dashboardStats"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/admin/js/admin.js"></script>
+    <script src="/admin/js/auth.js"></script>
+</body>
+</html>

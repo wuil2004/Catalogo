@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registros de Tesis - TESJI</title>
+  <style>
+    /* --- NUEVA PALETA DE COLORES --- */
+    :root {
+      --color-fondo: #f8f9fa;
+      --color-verde-principal: #005A3A; /* Verde oscuro del logo */
+      --color-verde-hover: #00452c;
+      --color-amarillo-acento: #fecb00; /* Amarillo del logo */
+      --color-texto-principal: #212529;
+      --color-texto-secundario: #6c757d;
+      --color-bordes: #dee2e6;
+      --color-blanco: #ffffff;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-fondo);
+      color: var(--color-texto-principal);
+      padding: 20px;
+      margin: 0;
+    }
+    
+    /* --- HEADER ACTUALIZADO CON DOS LOGOS --- */
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .header-logo {
+      max-height: 85px;
+      width: auto;
+    }
+    
+    h1 {
+      color: var(--color-texto-principal);
+      text-align: center;
+      margin: 0;
+      font-weight: 600;
+      font-size: 2rem;
+    }
+    
+    /* --- CONTROLES CON NUEVO ESTILO --- */
+    .controls-container {
+      background-color: var(--color-blanco);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      margin-bottom: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+      border: 1px solid var(--color-bordes);
+    }
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--color-texto-secundario);
+      font-size: 14px;
+    }
+    .filter-input, .filter-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-bordes);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .filter-input:focus, .filter-select:focus {
+      border-color: var(--color-verde-principal);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 90, 58, 0.15);
+    }
+
+    /* --- TARJETAS Y BORDES POR CARRERA (CONSERVADOS) --- */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+    }
+    .card {
+      background-color: var(--color-blanco);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--color-bordes);
+      border-left-width: 5px; /* Grosor del borde de color */
+    }
+    
+    /* ESTILOS TEMÁTICOS CONSERVADOS */
+    .card[data-carrera*="ING."] { border-left-color: #3498db; }
+    .card[data-carrera*="LIC. INFORMATICA"],
+    .card[data-carrera*="ING. INFORMATICA"] { border-left-color: #1b81c1; }
+    .card[data-carrera*="ING. SISTEMAS COMPUTACIONALES"] { border-left-color: #098b05; }
+    .card[data-carrera*="ING. TICS"] { border-left-color: #1d5f96; }
+    .card[data-carrera*="LIC. ADMINISTRACIÓN"] { border-left-color: #f31212; }
+    .card[data-carrera*="ING. INDUSTRIAL"],
+    .card[data-carrera*="ING. LOGISTICA"] { border-left-color: #1054bb; }
+    .card[data-carrera*="ING. QUIMICA"] { border-left-color: #f60303; }
+    .card[data-carrera*="ING. CIVIL"] { border-left-color: #cc8109ba; }
+    .card[data-carrera*="ING. MECATRONICA"] { border-left-color: #7c7c7c; }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      border-color: var(--color-verde-principal);
+    }
+    .card-header {
+      border-bottom: 1px solid var(--color-bordes);
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-texto-principal);
+      margin: 0 0 5px 0;
+      line-height: 1.3;
+    }
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--color-texto-secundario);
+      margin: 0;
+    }
+    .card-body { font-size: 14px; }
+    .card-row { display: flex; margin-bottom: 8px; }
+    .card-label { font-weight: 500; min-width: 120px; color: #555; }
+    .card-value { flex: 1; color: var(--color-texto-principal); }
+    .no-registros { text-align: center; color: var(--color-texto-secundario); font-style: italic; padding: 40px 20px; grid-column: 1 / -1; }
+    
+    /* --- MODAL CON NUEVO ESTILO --- */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .modal-content {
+      background-color: var(--color-blanco); margin: 50px auto; padding: 30px; border-radius: 10px;
+      width: 80%; max-width: 800px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      transform: translateY(-20px); transition: transform 0.3s;
+    }
+    .modal-header {
+      border-bottom: 1px solid var(--color-bordes); padding-bottom: 15px; margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-title { font-size: 24px; color: var(--color-texto-principal); margin: 0; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--color-texto-secundario); }
+    .modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; }
+    .modal-column { display: flex; flex-direction: column; }
+    .modal-image-placeholder {
+      background-color: var(--color-fondo); border: 2px dashed var(--color-bordes); border-radius: 8px;
+      height: 250px; display: flex; align-items: center; justify-content: center;
+      color: var(--color-texto-secundario); font-style: italic;
+    }
+    .modal-row { margin-bottom: 12px; }
+    .modal-label { font-weight: 500; color: var(--color-texto-secundario); display: block; margin-bottom: 3px; font-size: 14px; }
+    .modal-value { color: var(--color-texto-principal); font-size: 15px; }
+    .modal-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--color-bordes); display: flex; flex-direction: column; gap: 15px; }
+    .modal-project-info { display: flex; flex-direction: column; gap: 5px; }
+    .modal-project-label { font-size: 14px; color: var(--color-texto-secundario); font-weight: 500; }
+    .modal-project-title { font-size: 18px; font-weight: 600; color: var(--color-texto-principal); word-break: break-word; }
+    .modal-actions { display: flex; justify-content: flex-end; }
+    .modal-btn {
+      padding: 10px 20px; background: var(--color-verde-principal); color: white; border: none;
+      border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
+      transition: background-color 0.3s;
+    }
+    .modal-btn:hover { background: var(--color-verde-hover); }
+    
+    /* --- LOADER CON NUEVO COLOR --- */
+    .loader-container { display: flex; justify-content: center; padding: 40px; grid-column: 1 / -1; }
+    .loader {
+      width: 50px; height: 50px; border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--color-verde-principal);
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* --- ESTILOS DE PAGINACIÓN --- */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      padding: 15px 0;
+      grid-column: 1 / -1;
+    }
+    
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 5px;
+    }
+    
+    .page-item {
+      margin: 0 2px;
+    }
+    
+    .page-link {
+      display: block;
+      padding: 8px 14px;
+      background-color: var(--color-blanco);
+      border: 1px solid var(--color-bordes);
+      border-radius: 4px;
+      color: var(--color-texto-principal);
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .page-link:hover {
+      background-color: var(--color-fondo);
+    }
+    
+    .page-item.active .page-link {
+      background-color: var(--color-verde-principal);
+      color: white;
+      border-color: var(--color-verde-principal);
+    }
+    
+    .page-item.disabled .page-link {
+      color: var(--color-texto-secundario);
+      pointer-events: none;
+      background-color: var(--color-fondo);
+    }
+    
+    .registros-info {
+      text-align: center;
+      color: var(--color-texto-secundario);
+      font-size: 14px;
+      margin-top: 10px;
+      grid-column: 1 / -1;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .modal-body { grid-template-columns: 1fr; }
+      .modal-content { width: 90%; margin: 20px auto; }
+      .modal-image-placeholder { height: 200px; margin-top: 20px; }
+      h1 {font-size: 1.5rem;}
+      .header-logo {max-height: 60px;}
+      
+      .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .cards-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-container">
+    <img src="/public/assets/images.png" alt="Logo Institucional TESJI" class="header-logo">
+    <h1>Registros de Tesis</h1>
+    <img src="/public/assets/imaes.png" alt="Logo Linces TESJI" class="header-logo">
+  </div>
+  
+  <div class="controls-container">
+    <div class="filter-group">
+      <label for="campoBusqueda">Buscar por:</label>
+      <select id="campoBusqueda" class="filter-select">
+        <option value="Titulo">Título</option>
+        <option value="Carrera">Carrera</option>
+        <option value="Nombre_1">Nombre del Autor 1</option>
+        <option value="Nombre_2">Nombre del Autor 2</option>
+        <option value="Nombre_3">Nombre del Autor 3</option>
+        <option value="Opcion_de_Titulacion">Opción de Titulación</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="filtroTexto">Texto a buscar:</label>
+      <input type="text" id="filtroTexto" class="filter-input" placeholder="Escribe aquí..." oninput="filtrarRegistros()">
+    </div>
+    
+    <div class="filter-group">
+      <label for="filtroCarrera">Filtrar por carrera:</label>
+      <select id="filtroCarrera" class="filter-select" onchange="filtrarRegistros()">
+        <option value="">Todas las carreras</option>
+        </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="registrosPorPagina">Registros por página:</label>
+      <select id="registrosPorPagina" class="filter-select" onchange="cambiarRegistrosPorPagina()">
+        <option value="10">10</option>
+        <option value="20" selected>20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="0">Todos</option>
+      </select>
+    </div>
+  </div>
+  
+  <div id="cardsContainer" class="cards-container">
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+  </div>
+  
+  <div id="paginationContainer" class="pagination-container">
+    <!-- La paginación se generará dinámicamente -->
+  </div>
+  
+  <div id="registrosInfo" class="registros-info">
+    <!-- La información de registros se generará dinámicamente -->
+  </div>
+  
+  <div id="modalDetalles" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Trabajo de Titulacion</h2>
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        </div>
+      <div class="modal-footer">
+        <div class="modal-project-info">
+          <span class="modal-project-label">Nombre del proyecto:</span>
+          <span id="modalTituloTesis" class="modal-project-title"></span>
+        </div>
+        <div class="modal-actions">
+          <button onclick="cerrarModal()" class="modal-btn">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let todosRegistros = [];
+    let registrosFiltrados = [];
+    let carrerasUnicas = new Set();
+    let registrosPorPagina = 20;
+    let paginaActual = 1;
+    
+    async function obtenerRegistros() {
+      try {
+        document.getElementById('cardsContainer').innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+        
+        // Simulación de fetch. Reemplaza la URL con la tuya.
+        const respuesta = await fetch('http://localhost:3000/api/registros');
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        todosRegistros = await respuesta.json();
+        
+        carrerasUnicas = new Set(todosRegistros.map(r => r.Carrera).filter(Boolean));
+        const selectCarreras = document.getElementById('filtroCarrera');
+        
+        const carrerasOrdenadas = Array.from(carrerasUnicas).sort();
+        
+        carrerasOrdenadas.forEach(carrera => {
+          const option = document.createElement('option');
+          option.value = carrera;
+          option.textContent = carrera;
+          selectCarreras.appendChild(option);
+        });
+        
+        registrosFiltrados = [...todosRegistros];
+        mostrarRegistrosPaginados();
+      } catch (error) {
+        console.error('Error al obtener registros:', error);
+        document.getElementById('cardsContainer').innerHTML = 
+          '<div class="no-registros">Error al cargar los registros. Verifique la conexión con el servidor.</div>';
+      }
+    }
+    
+    function mostrarRegistrosPaginados() {
+      const container = document.getElementById('cardsContainer');
+      const paginationContainer = document.getElementById('paginationContainer');
+      const registrosInfo = document.getElementById('registrosInfo');
+      
+      // Calcular registros para la página actual
+      const inicio = (paginaActual - 1) * registrosPorPagina;
+      const fin = registrosPorPagina === 0 ? registrosFiltrados.length : inicio + registrosPorPagina;
+      const registrosPagina = registrosFiltrados.slice(inicio, fin);
+      
+      // Mostrar registros
+      if (registrosPagina.length === 0) {
+        container.innerHTML = '<div class="no-registros">No se encontraron registros que coincidan con los filtros.</div>';
+      } else {
+        container.innerHTML = '';
+        
+        registrosPagina.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.setAttribute('data-carrera', r.Carrera || '');
+          
+          card.innerHTML = `
+            <div class="card-header">
+              <h3 class="card-title">${r.Titulo || 'Sin título'}</h3>
+              <p class="card-subtitle">${r.Carrera || 'Carrera no especificada'}</p>
+            </div>
+            <div class="card-body">
+              <div class="card-row">
+                <span class="card-label">Titulación:</span>
+                <span class="card-value">${r.Opcion_de_Titulacion || 'No especificada'}</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Fecha:</span>
+                <span class="card-value">${r.Fecha_del_Trabajo || 'No especificada'}</span>
+              </div>
+            </div>
+          `;
+          
+          card.addEventListener('click', () => mostrarDetallesRegistro(r));
+          container.appendChild(card);
+        });
+      }
+      
+      // Mostrar información de registros
+      const totalRegistros = registrosFiltrados.length;
+      const textoInfo = registrosPorPagina === 0 
+        ? `Mostrando todos los ${totalRegistros} registros` 
+        : `Mostrando registros ${inicio + 1} a ${Math.min(fin, totalRegistros)} de ${totalRegistros}`;
+      
+      registrosInfo.textContent = textoInfo;
+      
+      // Generar paginación solo si hay más de una página
+      if (registrosPorPagina > 0 && totalRegistros > registrosPorPagina) {
+        const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+        
+        let paginacionHTML = '<ul class="pagination">';
+        
+        // Botón Anterior
+        paginacionHTML += `
+          <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+            <a class="page-link" onclick="cambiarPagina(${paginaActual - 1})">Anterior</a>
+          </li>
+        `;
+        
+        // Páginas
+        const maxPaginasVisibles = 5;
+        let inicioPaginas = Math.max(1, paginaActual - Math.floor(maxPaginasVisibles / 2));
+        let finPaginas = Math.min(totalPaginas, inicioPaginas + maxPaginasVisibles - 1);
+        
+        // Ajustar si estamos cerca del final
+        if (finPaginas - inicioPaginas + 1 < maxPaginasVisibles) {
+          inicioPaginas = Math.max(1, finPaginas - maxPaginasVisibles + 1);
+        }
+        
+        // Primera página y elipsis si es necesario
+        if (inicioPaginas > 1) {
+          paginacionHTML += `
+            <li class="page-item">
+              <a class="page-link" onclick="cambiarPagina(1)">1</a>
+            </li>
+          `;
+          if (inicioPaginas > 2) {
+            paginacionHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+          }
+        }
+        
+        // Páginas visibles
+        for (let i = inicioPaginas; i <= finPaginas; i++) {
+          paginacionHTML += `
+            <li class="page-item ${i === paginaActual ? 'active' : ''}">
+              <a class="page-link" onclick="cambiarPagina(${i})">${i}</a>
+            </li>
+          `;
+        }
+        
+        // Última página y elipsis si es necesario
+        if (finPaginas < totalPaginas) {
+          if (finPaginas < totalPaginas - 1) {
+            paginacionHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+          }
+          paginacionHTML += `
+            <li class="page-item">
+              <a class="page-link" onclick="cambiarPagina(${totalPaginas})">${totalPaginas}</a>
+            </li>
+          `;
+        }
+        
+        // Botón Siguiente
+        paginacionHTML += `
+          <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+            <a class="page-link" onclick="cambiarPagina(${paginaActual + 1})">Siguiente</a>
+          </li>
+        `;
+        
+        paginacionHTML += '</ul>';
+        paginationContainer.innerHTML = paginacionHTML;
+      } else {
+        paginationContainer.innerHTML = '';
+      }
+    }
+    
+    function cambiarPagina(nuevaPagina) {
+      if (nuevaPagina < 1 || (registrosPorPagina > 0 && nuevaPagina > Math.ceil(registrosFiltrados.length / registrosPorPagina))) {
+        return;
+      }
+      paginaActual = nuevaPagina;
+      mostrarRegistrosPaginados();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function cambiarRegistrosPorPagina() {
+      registrosPorPagina = parseInt(document.getElementById('registrosPorPagina').value);
+      paginaActual = 1;
+      mostrarRegistrosPaginados();
+    }
+    
+    function mostrarDetallesRegistro(registro) {
+      const modal = document.getElementById('modalDetalles');
+      const modalBody = document.getElementById('modalBody');
+      const modalTituloTesis = document.getElementById('modalTituloTesis');
+      
+      modalTituloTesis.textContent = registro.Titulo || 'Sin título';
+      
+      modalBody.innerHTML = `
+        <div class="modal-column">
+          <div class="modal-row">
+            <span class="modal-label">Autor(es):</span>
+            <span class="modal-value">
+              ${[registro.Nombre_1, registro.Nombre_2, registro.Nombre_3].filter(n => n).join(', ') || 'No especificados'}
+            </span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Opción de Titulación:</span>
+            <span class="modal-value">${registro.Opcion_de_Titulacion || 'No especificada'}</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Carrera:</span>
+            <span class="modal-value">${registro.Carrera || 'No especificada'}</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Fecha del Trabajo:</span>
+            <span class="modal-value">${registro.Fecha_del_Trabajo || 'No especificada'}</span>
+          </div>
+        </div>
+        <div class="modal-column">
+          <div class="modal-image-placeholder">
+            Imagen del trabajo (a implementar)
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = 'block';
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        document.querySelector('.modal-content').style.transform = 'translateY(0)';
+      }, 10);
+      
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function cerrarModal() {
+      const modal = document.getElementById('modalDetalles');
+      modal.style.opacity = '0';
+      document.querySelector('.modal-content').style.transform = 'translateY(-20px)';
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }, 300);
+    }
+    
+    function filtrarRegistros() {
+      const campoBusqueda = document.getElementById('campoBusqueda').value;
+      const textoBusqueda = document.getElementById('filtroTexto').value.toLowerCase();
+      const carreraFiltro = document.getElementById('filtroCarrera').value;
+      
+      registrosFiltrados = todosRegistros.filter(r => {
+        const porCarrera = !carreraFiltro || r.Carrera === carreraFiltro;
+        if (!porCarrera) return false;
+        
+        if (!textoBusqueda) return true;
+        
+        let valorCampo = '';
+        if (campoBusqueda.startsWith('Nombre_')) {
+          valorCampo = r[campoBusqueda] || '';
+        } else {
+          valorCampo = r[campoBusqueda] || '';
+        }
+        return valorCampo.toLowerCase().includes(textoBusqueda);
+      });
+      
+      paginaActual = 1;
+      mostrarRegistrosPaginados();
+    }
+    
+    document.addEventListener('DOMContentLoaded', obtenerRegistros);
+    
+    window.addEventListener('click', (event) => {
+      const modal = document.getElementById('modalDetalles');
+      if (event.target === modal) {
+        cerrarModal();
+      }
+    });
+  </script>
+</body>
+</html>
