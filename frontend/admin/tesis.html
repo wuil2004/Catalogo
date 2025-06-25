@@ -61,7 +61,7 @@
                             <i class="fas fa-th-large"></i>
                         </button>
                     </div>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary" id="newWorkBtn">
                         <i class="fas fa-plus"></i> Nuevo Trabajo
                     </button>
                     <button class="btn btn-secondary">
@@ -237,6 +237,120 @@
                     <div class="details-accounts" id="cardDetailsAccounts"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal para nuevo registro -->
+    <div id="newRegistroModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title"><i class="fas fa-plus"></i> Nuevo Trabajo de Titulación</h3>
+            
+            <form id="newRegistroForm" class="form-container">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nImpresoDigital">Código/N° Impreso Digital:</label>
+                        <input type="text" id="nImpresoDigital" name="N_Impreso_Digital" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carrera">Carrera:</label>
+                        <select id="carrera" name="Carrera" required>
+                            <option value="">Seleccione una carrera</option>
+                            <option value="Ingeniería en Sistemas">Ingeniería en Sistemas</option>
+                            <option value="Ingeniería Civil">Ingeniería Civil</option>
+                            <option value="Arquitectura">Arquitectura</option>
+                            <!-- Agrega más opciones según necesites -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="titulo">Título del Trabajo:</label>
+                        <textarea id="titulo" name="Titulo" rows="2" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="opcionTitulacion">Opción de Titulación:</label>
+                        <select id="opcionTitulacion" name="Opcion_de_Titulacion" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Tesis">Tesis</option>
+                            <option value="Examen Complexivo">Examen Complexivo</option>
+                            <option value="Proyecto de Grado">Proyecto de Grado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fechaTrabajo">Mes y Año:</label>
+                        <input type="month" id="fechaTrabajo" name="Fecha_del_Trabajo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color">Color:</label>
+                        <select id="color" name="Color">
+                            <option value="">Sin color</option>
+                            <option value="Rojo">Rojo</option>
+                            <option value="Azul">Azul</option>
+                            <option value="Verde">Verde</option>
+                            <option value="Amarillo">Amarillo</option>
+                            <option value="Negro">Negro</option>
+                            <option value="Blanco">Blanco</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h4>Estudiantes</h4>
+                    
+                    <div class="student-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre1">Estudiante 1:</label>
+                                <input type="text" id="nombre1" name="Nombre_1">
+                            </div>
+                            <div class="form-group">
+                                <label for="cuenta1">N° de Cuenta:</label>
+                                <input type="text" id="cuenta1" name="N_Cuenta_1">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre2">Estudiante 2:</label>
+                                <input type="text" id="nombre2" name="Nombre_2">
+                            </div>
+                            <div class="form-group">
+                                <label for="cuenta2">N° de Cuenta:</label>
+                                <input type="text" id="cuenta2" name="N_Cuenta_2">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre3">Estudiante 3:</label>
+                                <input type="text" id="nombre3" name="Nombre_3">
+                            </div>
+                            <div class="form-group">
+                                <label for="cuenta3">N° de Cuenta:</label>
+                                <input type="text" id="cuenta3" name="N_Cuenta_3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagen">URL de la Imagen:</label>
+                    <input type="text" id="imagen" name="imagen" placeholder="Ingrese URL de la imagen (opcional)">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('newRegistroModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Trabajo</button>
+                </div>
+            </form>
         </div>
     </div>
 
