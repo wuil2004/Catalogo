@@ -104,9 +104,6 @@ function setupEventListeners() {
         applyFilters();
     });
 
-    // Filtros avanzados
-
-
     // Cambio de vista
     document.getElementById('tableViewBtn').addEventListener('click', () => {
         currentView = 'table';
@@ -137,7 +134,6 @@ function setupEventListeners() {
 
 // Configurar modales
 function setupModals() {
-    // Dentro de setupModals()
     const newRegistroModal = document.getElementById('newRegistroModal');
     const closeNewRegistroModal = newRegistroModal.querySelector('.close-modal');
 
@@ -179,14 +175,14 @@ function setupModals() {
 
     // Cerrar modales con ESC
     window.onkeydown = (event) => {
-    if (event.key === 'Escape') {
-        textModal.style.display = 'none';
-        imageModal.style.display = 'none';
-        newRegistroModal.style.display = 'none';
-        document.getElementById('advancedFiltersModal').style.display = 'none';
-        document.getElementById('cardDetailsModal').style.display = 'none';
-    }
-};
+        if (event.key === 'Escape') {
+            textModal.style.display = 'none';
+            imageModal.style.display = 'none';
+            newRegistroModal.style.display = 'none';
+            document.getElementById('advancedFiltersModal').style.display = 'none';
+            document.getElementById('cardDetailsModal').style.display = 'none';
+        }
+    };
 }
 
 // Configurar responsividad
@@ -249,7 +245,7 @@ async function loadRegistros() {
         displayPage(currentPage);
 
     } catch (error) {
-        showToast(error.message, 'error');
+        console.error('Error cargando registros:', error);
     } finally {
         hideLoading();
     }
@@ -315,8 +311,6 @@ function applyFilters() {
     currentPage = 1;
     updatePagination();
     displayPage(currentPage);
-
-    showToast(`Filtros aplicados: ${totalItems} registros encontrados`, 'success');
 }
 
 // Mostrar página específica
@@ -665,44 +659,6 @@ function hideLoading() {
     document.querySelector('.loading-overlay').style.display = 'none';
 }
 
-// Mostrar notificación toast
-function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-icon">
-            ${type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' :
-            type === 'success' ? '<i class="fas fa-check-circle"></i>' :
-                '<i class="fas fa-info-circle"></i>'}
-        </div>
-        <div class="toast-message">${message}</div>
-        <button class="toast-close"><i class="fas fa-times"></i></button>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            toastContainer.removeChild(toast);
-        }, 300);
-    }, 5000);
-
-    // Close button
-    toast.querySelector('.toast-close').addEventListener('click', () => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            toastContainer.removeChild(toast);
-        }, 300);
-    });
-}
-
 // Funciones globales
 window.showFullText = function (title, content) {
     const modal = document.getElementById('textModal');
@@ -748,7 +704,7 @@ function setupNewRegistroForm() {
 
         // Validar
         if (!mes || !anio) {
-            showToast('Seleccione mes y año válidos', 'error');
+            console.error('Seleccione mes y año válidos');
             return;
         }
 
@@ -782,13 +738,27 @@ function setupNewRegistroForm() {
             if (!response.ok) throw new Error('Error al crear registro');
             
             document.getElementById('newRegistroModal').style.display = 'none';
-            showToast('Registro creado exitosamente', 'success');
             await loadRegistros();
 
         } catch (error) {
-            showToast(error.message, 'error');
+            console.error(error.message);
         } finally {
             hideLoading();
         }
     });
+}
+
+// Actualizar paginación
+function updatePagination() {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const pagination = document.querySelector('.pagination');
+    
+    // Actualizar estado de botones
+    document.getElementById('firstPage').disabled = currentPage === 1;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+    document.getElementById('lastPage').disabled = currentPage === totalPages || totalPages === 0;
+    
+    // Actualizar números de página
+    updatePageNumbers(currentPage);
 }

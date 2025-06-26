@@ -84,33 +84,6 @@ body {
     gap: 20px;
 }
 
-.notifications {
-    position: relative;
-    cursor: pointer;
-    color: #555;
-    font-size: 1.1rem;
-    transition: var(--transition);
-}
-
-.notifications:hover {
-    color: var(--primary-color);
-}
-
-.notifications .badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: var(--danger-color);
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .user-dropdown {
     position: relative;
     display: flex;
@@ -842,8 +815,6 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Filtros avanzados */
-
 /* Loading overlay */
 .loading-overlay {
     display: none;
@@ -878,9 +849,6 @@ body {
     color: var(--text-color);
     font-weight: 500;
 }
-
-/* Notificaciones toast */
-
 
 /* Responsividad */
 @media (max-width: 1200px) {
@@ -1017,7 +985,6 @@ body {
         order: -1;
     }
 }
-
 
 /* Estilos para el modal de nuevo registro */
 .form-container {
