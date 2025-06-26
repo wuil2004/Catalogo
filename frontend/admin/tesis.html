@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="/admin/css/styles.css">
     <link rel="stylesheet" href="/admin/css/tesis.css">
 </head>
+
 <body>
     <!-- Barra de navegación superior -->
     <header class="top-navbar">
@@ -43,7 +45,8 @@
             <nav>
                 <ul>
                     <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="active"><a href="tesis.html"><i class="fas fa-graduation-cap"></i> Trabajos de titulación</a></li>
+                    <li class="active"><a href="tesis.html"><i class="fas fa-graduation-cap"></i> Trabajos de
+                            titulación</a></li>
                     <li><a href="admins.html"><i class="fas fa-users-cog"></i> Administradores</a></li>
                 </ul>
             </nav>
@@ -76,25 +79,25 @@
                     <input type="text" id="searchInput" placeholder="Buscar por título, estudiante...">
                     <button id="searchBtn"><i class="fas fa-search"></i></button>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="carreraFilter">Carrera:</label>
                     <select id="carreraFilter">
                         <option value="">Todas</option>
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="fechaFilter">Año:</label>
                     <select id="fechaFilter">
                         <option value="">Todos</option>
                     </select>
                 </div>
-                
+
                 <button id="resetFilters" class="btn btn-outline">
                     <i class="fas fa-undo"></i> Limpiar
                 </button>
-                
+
                 <button id="advancedFilterBtn" class="btn btn-outline">
                     <i class="fas fa-filter"></i> Avanzados
                 </button>
@@ -147,10 +150,12 @@
                 <!-- Paginación -->
                 <div class="table-footer">
                     <div class="table-info">
-                        Mostrando <span id="startItem">1</span>-<span id="endItem">10</span> de <span id="totalItems">0</span> registros
+                        Mostrando <span id="startItem">1</span>-<span id="endItem">10</span> de <span
+                            id="totalItems">0</span> registros
                     </div>
                     <div class="pagination">
-                        <button class="page-btn" id="firstPage" disabled><i class="fas fa-angle-double-left"></i></button>
+                        <button class="page-btn" id="firstPage" disabled><i
+                                class="fas fa-angle-double-left"></i></button>
                         <button class="page-btn" id="prevPage" disabled><i class="fas fa-angle-left"></i></button>
                         <div class="page-numbers">
                             <button class="page-btn active">1</button>
@@ -245,66 +250,106 @@
         <div class="modal-content" style="max-width: 800px;">
             <span class="close-modal">&times;</span>
             <h3 class="modal-title"><i class="fas fa-plus"></i> Nuevo Trabajo de Titulación</h3>
-            
+
             <form id="newRegistroForm" class="form-container">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nImpresoDigital">Código/N° Impreso Digital:</label>
                         <input type="text" id="nImpresoDigital" name="N_Impreso_Digital" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="carrera">Carrera:</label>
                         <select id="carrera" name="Carrera" required>
                             <option value="">Seleccione una carrera</option>
-                            <option value="Ingeniería en Sistemas">Ingeniería en Sistemas</option>
-                            <option value="Ingeniería Civil">Ingeniería Civil</option>
-                            <option value="Arquitectura">Arquitectura</option>
+                            <option value="ING. INDUSTRIAL">ING. INDUSTRIAL</option>
+                            <option value="LIC. INFORMATICA">LIC. INFORMATICA</option>
+                            <option value="ING. INFORMATICA">ING. INFORMATICA</option>
+                            <option value="ING. SISTEMAS COMPUTACIONALES">ING. EN SISTEMAS COMPUTACIONALES</option>
+                            <option value="ING. MECATRONICA">ING. MECATRONICA</option>
+                            <option value="ING. CIVIL">ING. CIVIL</option>
+                            <option value="LIC. ADMINISTRACIÓN">LIC. ADMINISTRACIÓN</option>
+                            <option value="ING. QUIMICA">ING. QUIMICA</option>
+                            <option value="ING. LOGISTICA">ING. LOGISTICA</option>
+                            <option value="ING. ELECTRICA">ING. ELECTRICA</option>
+                            <option value="ING. TICS">ING. TICS</option>
+                            <option value="ING. TICS">NINGUNA</option>
                             <!-- Agrega más opciones según necesites -->
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="titulo">Título del Trabajo:</label>
                         <textarea id="titulo" name="Titulo" rows="2" required></textarea>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="opcionTitulacion">Opción de Titulación:</label>
                         <select id="opcionTitulacion" name="Opcion_de_Titulacion" required>
                             <option value="">Seleccione una opción</option>
-                            <option value="Tesis">Tesis</option>
-                            <option value="Examen Complexivo">Examen Complexivo</option>
-                            <option value="Proyecto de Grado">Proyecto de Grado</option>
+                            <option value="Memoria de Residencia">Memoria de Residencia</option>
+                            <option value="Memoria de Residencia Profesional">Memoria de Residencia Profesional</option>
+                            <option value="Informe de Residencia Profesional">Informe de Residencia Profesional</option>
+                            <option value="Informe Técnico de Residencia Profesional">Informe Técnico de Residencia Profesional</option>
+                            <option value="Curso Especial o Seminario de Titulación">Curso Especial o Seminario de Titulación</option>
+                            <option value="Memoria de Experiencia Profesional">Memoria de Experiencia Profesional</option>
+                            <option value="Proyecto de Investigación">Proyecto de Investigación</option>
+                            <option value="Proyecto integrador">Proyecto integrador</option>
+                            <option value="Libro de Texto o Prototipos Didacticos">Libro de Texto o Prototipos Didacticos</option>
+                            <option value="Proyecto de Innovación Tecnológica">Proyecto de Innovación Tecnológica</option>
+                            <option value="Tesis Profesional">Tesis Profesional</option>
+                            <option value="Trabajo Profesional">Trabajo Profesional</option>
+                            <option value="Modelo de Educación Dual">Modelo de Educación Dual</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="fechaTrabajo">Mes y Año:</label>
-                        <input type="month" id="fechaTrabajo" name="Fecha_del_Trabajo" required>
+                        <label>Mes y Año:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="mesTrabajo" name="mes" required>
+                                <option value="">Seleccione mes</option>
+                                <option value="01">ENERO</option>
+                                <option value="02">FEBRERO</option>
+                                <option value="03">MARZO</option>
+                                <option value="04">ABRIL</option>
+                                <option value="05">MAYO</option>
+                                <option value="06">JUNIO</option>
+                                <option value="07">JULIO</option>
+                                <option value="08">AGOSTO</option>
+                                <option value="09">SEPTIEMBRE</option>
+                                <option value="10">OCTUBRE</option>
+                                <option value="11">NOVIEMBRE</option>
+                                <option value="12">DICIEMBRE</option>
+                            </select>
+                            <input type="number" id="anioTrabajo" name="anio" min="2000" max="2030" placeholder="Año"
+                                required>
+                        </div>
+                        <input type="hidden" id="fechaTrabajo" name="Fecha_del_Trabajo">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="color">Color:</label>
                         <select id="color" name="Color">
                             <option value="">Sin color</option>
-                            <option value="Rojo">Rojo</option>
-                            <option value="Azul">Azul</option>
-                            <option value="Verde">Verde</option>
-                            <option value="Amarillo">Amarillo</option>
-                            <option value="Negro">Negro</option>
-                            <option value="Blanco">Blanco</option>
+                            <option value="Rojo">NEGRO</option>
+                            <option value="Azul">AZUL</option>
+                            <option value="Verde">VERDE</option>
+                            <option value="GRIS OXFORD">GRIS OXFORD</option>
+                            <option value="CAFE">CAFE</option>
+                            <option value="VINO">VINO</option>
+                            <option value="ROJO">ROJO</option>
+                            <option value="GRIS">GRIS</option>
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
                     <h4>Estudiantes</h4>
-                    
+
                     <div class="student-fields">
                         <div class="form-row">
                             <div class="form-group">
@@ -316,7 +361,7 @@
                                 <input type="text" id="cuenta1" name="N_Cuenta_1">
                             </div>
                         </div>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="nombre2">Estudiante 2:</label>
@@ -327,7 +372,7 @@
                                 <input type="text" id="cuenta2" name="N_Cuenta_2">
                             </div>
                         </div>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="nombre3">Estudiante 3:</label>
@@ -340,14 +385,15 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="imagen">URL de la Imagen:</label>
                     <input type="text" id="imagen" name="imagen" placeholder="Ingrese URL de la imagen (opcional)">
                 </div>
-                
+
                 <div class="form-actions">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('newRegistroModal').style.display='none'">Cancelar</button>
+                    <button type="button" class="btn btn-outline"
+                        onclick="document.getElementById('newRegistroModal').style.display='none'">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar Trabajo</button>
                 </div>
             </form>
@@ -366,4 +412,5 @@
     <script src="/admin/js/auth.js"></script>
     <script src="/admin/js/tesis.js"></script>
 </body>
+
 </html>

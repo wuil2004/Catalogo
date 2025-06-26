@@ -742,13 +742,33 @@ function setupNewRegistroForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Obtener los datos del formulario
+        // Obtener mes y año
+        const mes = document.getElementById('mesTrabajo').value;
+        const anio = document.getElementById('anioTrabajo').value;
+
+        // Validar
+        if (!mes || !anio) {
+            showToast('Seleccione mes y año válidos', 'error');
+            return;
+        }
+
+        // Mapear mes a texto (EJ: "07" -> "JULIO")
+        const meses = {
+            '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL',
+            '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO',
+            '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE'
+        };
+
+        // Formatear fecha como "JULIO DE 2025"
+        const fechaTexto = `${meses[mes]} DE ${anio}`;
+        document.getElementById('fechaTrabajo').value = fechaTexto; // Asignar al hidden input
+
+        // Crear objeto con los datos del formulario
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
         try {
             showLoading();
-
             const token = localStorage.getItem('adminToken');
             const response = await fetch('http://localhost:3000/api/registros/admin', {
                 method: 'POST',
@@ -759,20 +779,10 @@ function setupNewRegistroForm() {
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al crear el registro');
-            }
-
-            const result = await response.json();
-
-            // Cerrar el modal
+            if (!response.ok) throw new Error('Error al crear registro');
+            
             document.getElementById('newRegistroModal').style.display = 'none';
-
-            // Mostrar mensaje de éxito
             showToast('Registro creado exitosamente', 'success');
-
-            // Recargar los registros
             await loadRegistros();
 
         } catch (error) {
