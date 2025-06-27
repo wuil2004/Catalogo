@@ -144,18 +144,8 @@ function toggleSidebar() {
     
     if (isMobile) {
         sidebar.classList.toggle('show');
-        // Ajustar el contenido principal
-        if (sidebar.classList.contains('show')) {
-            document.querySelector('.main-content').style.marginLeft = '280px';
-            document.querySelector('.main-content').style.width = 'calc(100% - 280px)';
-        } else {
-            document.querySelector('.main-content').style.marginLeft = '0';
-            document.querySelector('.main-content').style.width = '100%';
-        }
     } else {
         sidebar.classList.toggle('collapsed');
-        // No necesitamos ajustar manualmente el contenido principal en desktop
-        // porque el CSS se encarga con los selectores adyacentes
     }
 }
 
