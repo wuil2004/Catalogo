@@ -11,42 +11,35 @@
 </head>
 
 <body>
-    <!-- Barra de navegación superior -->
-    <header class="top-navbar">
-        <div class="navbar-left">
-            <button class="sidebar-toggle" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="breadcrumbs">
-                <span>Panel de Administración</span> / <strong>Trabajos de Titulación</strong>
-            </div>
-        </div>
-        <div class="navbar-right">
-            <div class="user-dropdown">
-                <div class="user-info">
-                    <span class="user-name">Administrador</span>
-                    <span class="user-status active">En línea</span>
-                </div>
-                <img src="/admin/assets/images.png" alt="Usuario" class="user-avatar">
-                <div class="dropdown-menu">
-                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <!-- Contenedor principal -->
     <div class="admin-container">
-        <aside class="sidebar">
-            <div class="logo">
-                <img src="/admin/assets/images.png" alt="Logo">
-                <span>Admin Panel</span>
+        <!-- Panel lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="/admin/assets/images.png" alt="Logo">
+                    <span>Admin Panel</span>
+                </div>
+                <div class="user-controls">
+                    <div class="user-dropdown">
+                        <img src="/admin/assets/images.png" alt="Usuario" class="user-avatar" id="userAvatar">
+                        <div class="user-info">
+                            <span class="user-name">Administrador</span>
+                            <span class="user-status active">En línea</span>
+                        </div>
+                    </div>
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                </div>
             </div>
+            
             <nav>
                 <ul>
-                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="active"><a href="tesis.html"><i class="fas fa-graduation-cap"></i> Trabajos de titulación</a></li>
-                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> Administradores</a></li>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li class="active"><a href="tesis.html"><i class="fas fa-graduation-cap"></i> <span>Trabajos de titulación</span></a></li>
+                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> <span>Administradores</span></a></li>
+                    <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
                 </ul>
             </nav>
         </aside>
@@ -96,7 +89,6 @@
                 <button id="resetFilters" class="btn btn-outline">
                     <i class="fas fa-undo"></i> Limpiar
                 </button>
-
             </div>
 
             <!-- Vista de tabla -->

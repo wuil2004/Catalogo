@@ -2,27 +2,27 @@
 let currentPage = 1;
 let itemsPerPage = 10;
 let totalItems = 0;
-let originalData = [];  // Datos originales (nunca se modifican)
-let filteredData = [];  // Datos filtrados (copia para trabajar)
-let currentData = [];   // Datos de la página actual
-let currentView = 'table'; // 'table' o 'cards'
+let originalData = [];
+let filteredData = [];
+let currentData = [];
+let currentView = 'table';
 
 // Inicialización al cargar el DOM
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar autenticación
     await verifyAuth();
-
-    // Configurar eventos
     setupEventListeners();
-
-    // Cargar los registros
     await loadRegistros();
-
-    // Configurar modales
     setupModals();
-
-    // Configurar responsividad
     setupResponsive();
+    
+    // Agregar botón de menú para móviles
+    if (window.innerWidth <= 992) {
+        const mobileToggle = document.createElement('button');
+        mobileToggle.className = 'mobile-menu-toggle';
+        mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        mobileToggle.addEventListener('click', toggleSidebar);
+        document.body.appendChild(mobileToggle);
+    }
 });
 
 // Verificar autenticación
@@ -123,6 +123,30 @@ function setupEventListeners() {
 
     // Nuevo registro
     document.getElementById('newWorkBtn').addEventListener('click', () => showRegistroModal('create'));
+    
+    // Toggle sidebar con avatar
+    document.getElementById('userAvatar').addEventListener('click', toggleSidebar);
+    
+    // Toggle sidebar con botón
+    document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+    
+    // Redimensionamiento
+    window.addEventListener('resize', () => {
+        setupResponsive();
+        setupResponsiveTable();
+    });
+}
+
+// Alternar sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const isMobile = window.innerWidth <= 992;
+    
+    if (isMobile) {
+        sidebar.classList.toggle('show');
+    } else {
+        sidebar.classList.toggle('collapsed');
+    }
 }
 
 // Resetear filtros
@@ -131,7 +155,6 @@ function resetFilters() {
     document.getElementById('carreraFilter').value = '';
     document.getElementById('fechaFilter').value = '';
     
-    // Restaurar datos originales
     filteredData = [...originalData];
     totalItems = filteredData.length;
     currentPage = 1;
@@ -151,10 +174,8 @@ function setupModals() {
         }
     });
 
-    // Configurar el formulario
     setupRegistroForm();
 
-    // Cerrar modales al hacer clic fuera
     window.onclick = (event) => {
         modals.forEach(modal => {
             if (event.target === modal) {
@@ -163,7 +184,6 @@ function setupModals() {
         });
     };
 
-    // Cerrar modales con ESC
     window.onkeydown = (event) => {
         if (event.key === 'Escape') {
             modals.forEach(modal => {
@@ -175,8 +195,20 @@ function setupModals() {
 
 // Configurar responsividad
 function setupResponsive() {
-    window.addEventListener('resize', setupResponsiveTable);
-    setupResponsiveTable();
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    if (window.innerWidth <= 992) {
+        if (!mobileToggle) {
+            const newToggle = document.createElement('button');
+            newToggle.className = 'mobile-menu-toggle';
+            newToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            newToggle.addEventListener('click', toggleSidebar);
+            document.body.appendChild(newToggle);
+        } else {
+            mobileToggle.style.display = 'block';
+        }
+    } else if (mobileToggle) {
+        mobileToggle.style.display = 'none';
+    }
 }
 
 function setupResponsiveTable() {
@@ -186,7 +218,6 @@ function setupResponsiveTable() {
     const headers = table.querySelectorAll('th');
     const rows = table.querySelectorAll('tbody tr');
 
-    // Determinar qué columnas mostrar según el ancho de pantalla
     if (window.innerWidth < 768) {
         headers.forEach((header, index) => {
             if (header.classList.contains('priority-1')) {
@@ -231,7 +262,6 @@ async function loadRegistros() {
         filteredData = [...originalData];
         totalItems = filteredData.length;
         
-        // Llenar filtros
         fillFilters();
         
         updatePagination();
@@ -250,21 +280,18 @@ function fillFilters() {
     const carreraFilter = document.getElementById('carreraFilter');
     const fechaFilter = document.getElementById('fechaFilter');
     
-    // Limpiar opciones existentes (excepto la primera)
     while (carreraFilter.options.length > 1) carreraFilter.remove(1);
     while (fechaFilter.options.length > 1) fechaFilter.remove(1);
     
-    // Obtener valores únicos
     const carreras = [...new Set(originalData.map(item => item.Carrera))].filter(Boolean);
     const fechas = [...new Set(originalData.map(item => {
         if (item.Fecha_del_Trabajo) {
             const parts = item.Fecha_del_Trabajo.split(' ');
-            return parts[parts.length - 1]; // Obtener el año
+            return parts[parts.length - 1];
         }
         return null;
-    }))].filter(Boolean).sort((a, b) => b - a); // Ordenar de más reciente a más antiguo
+    }))].filter(Boolean).sort((a, b) => b - a);
     
-    // Llenar filtro de carreras
     carreras.forEach(carrera => {
         const option = document.createElement('option');
         option.value = carrera;
@@ -272,7 +299,6 @@ function fillFilters() {
         carreraFilter.appendChild(option);
     });
     
-    // Llenar filtro de fechas
     fechas.forEach(fecha => {
         const option = document.createElement('option');
         option.value = fecha;
@@ -287,10 +313,8 @@ function applyFilters() {
     const carrera = document.getElementById('carreraFilter').value;
     const fecha = document.getElementById('fechaFilter').value;
 
-    // Siempre empezar con los datos originales
     filteredData = [...originalData];
 
-    // Aplicar filtros sobre la copia
     if (searchTerm) {
         filteredData = filteredData.filter(item =>
             (item.Titulo && item.Titulo.toLowerCase().includes(searchTerm)) ||
@@ -310,7 +334,6 @@ function applyFilters() {
         );
     }
 
-    // Actualizar con los datos filtrados
     totalItems = filteredData.length;
     currentPage = 1;
     updatePagination();
@@ -323,25 +346,21 @@ function displayPage(page) {
     const end = start + itemsPerPage;
     currentData = filteredData.slice(start, end);
 
-    // Actualizar la vista según el modo actual
     if (currentView === 'table') {
         displayTable(currentData);
     } else {
         displayCards(currentData);
     }
 
-    // Actualizar información de paginación
     document.getElementById('startItem').textContent = start + 1;
     document.getElementById('endItem').textContent = Math.min(end, totalItems);
     document.getElementById('totalItems').textContent = totalItems;
 
-    // Actualizar estado de botones
     document.getElementById('firstPage').disabled = page === 1;
     document.getElementById('prevPage').disabled = page === 1;
     document.getElementById('nextPage').disabled = end >= totalItems;
     document.getElementById('lastPage').disabled = end >= totalItems;
 
-    // Actualizar números de página
     updatePageNumbers(page);
 }
 
@@ -470,7 +489,6 @@ function displayTable(data) {
         tbody.appendChild(row);
     });
 
-    // Reconfigurar la responsividad después de actualizar la tabla
     setupResponsiveTable();
 }
 
@@ -560,15 +578,12 @@ function showCardDetails(item) {
     const studentsContainer = document.getElementById('cardDetailsStudents');
     const accountsContainer = document.getElementById('cardDetailsAccounts');
 
-    // Establecer los valores
     title.textContent = item.Titulo || 'Sin título';
 
-    // Imagen
     imageContainer.innerHTML = item.imagen
         ? `<img src="${item.imagen}" alt="Imagen del trabajo">`
         : '<span class="no-image">Sin imagen</span>';
 
-    // Detalles principales
     registro.textContent = item.N_de_Registro || 'N/A';
     code.textContent = item.N_Impreso_Digital || 'N/A';
     career.textContent = item.Carrera || 'N/A';
@@ -578,7 +593,6 @@ function showCardDetails(item) {
         ? `${item.Color} <span style="background: ${getColorCode(item.Color)}; width: 15px; height: 15px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 5px;"></span>`
         : 'N/A';
 
-    // Estudiantes
     studentsContainer.innerHTML = '';
     if (item.Nombre_1) {
         const studentDiv = document.createElement('div');
@@ -602,7 +616,6 @@ function showCardDetails(item) {
         studentsContainer.innerHTML = '<div class="no-data">No hay estudiantes registrados</div>';
     }
 
-    // Cuentas
     accountsContainer.innerHTML = '';
     if (item.N_Cuenta_1) {
         const accountDiv = document.createElement('div');
@@ -626,7 +639,6 @@ function showCardDetails(item) {
         accountsContainer.innerHTML = '<div class="no-data">No hay cuentas registradas</div>';
     }
 
-    // Mostrar modal
     modal.style.display = 'block';
 }
 
@@ -706,7 +718,6 @@ function showRegistroModal(mode = 'create', registroData = null) {
     const title = document.getElementById('modalRegistroTitle');
     const submitBtn = document.getElementById('submitBtn');
     
-    // Resetear el formulario
     form.reset();
     
     if (mode === 'create') {
@@ -714,14 +725,11 @@ function showRegistroModal(mode = 'create', registroData = null) {
         submitBtn.textContent = 'Guardar Trabajo';
         document.getElementById('registroId').value = '';
         
-        // Configurar fecha actual por defecto
         const today = new Date();
         document.getElementById('anioTrabajo').value = today.getFullYear();
     } else if (mode === 'edit' && registroData) {
         title.innerHTML = '<i class="fas fa-edit"></i> Editar Trabajo de Titulación';
         submitBtn.textContent = 'Actualizar Trabajo';
-        
-        // Llenar el formulario con los datos del registro
         populateForm(registroData);
     }
     
@@ -730,15 +738,11 @@ function showRegistroModal(mode = 'create', registroData = null) {
 
 // Función para llenar el formulario con datos
 function populateForm(data) {
-    console.log('Datos recibidos para formulario:', data);
-    
-    // Campos básicos
     document.getElementById('registroId').value = data.N_de_Registro || '';
     document.getElementById('nImpresoDigital').value = data.N_Impreso_Digital || '';
     document.getElementById('titulo').value = data.Titulo || '';
     document.getElementById('imagen').value = data.imagen || '';
     
-    // Carrera
     if (data.Carrera) {
         const carreraSelect = document.getElementById('carrera');
         for (let i = 0; i < carreraSelect.options.length; i++) {
@@ -749,7 +753,6 @@ function populateForm(data) {
         }
     }
     
-    // Opción de titulación
     if (data.Opcion_de_Titulacion) {
         const opcionSelect = document.getElementById('opcionTitulacion');
         for (let i = 0; i < opcionSelect.options.length; i++) {
@@ -760,7 +763,6 @@ function populateForm(data) {
         }
     }
     
-    // Color
     if (data.Color) {
         const colorSelect = document.getElementById('color');
         for (let i = 0; i < colorSelect.options.length; i++) {
@@ -771,7 +773,6 @@ function populateForm(data) {
         }
     }
     
-    // Procesar fecha (formato: "MES DE AÑO")
     if (data.Fecha_del_Trabajo) {
         const [mesTexto, , anio] = data.Fecha_del_Trabajo.split(' ');
         const meses = {
@@ -780,19 +781,16 @@ function populateForm(data) {
             'SEPTIEMBRE': '09', 'OCTUBRE': '10', 'NOVIEMBRE': '11', 'DICIEMBRE': '12'
         };
         
-        // Mes
         if (mesTexto && meses[mesTexto]) {
             const mesSelect = document.getElementById('mesTrabajo');
             mesSelect.value = meses[mesTexto];
         }
         
-        // Año
         if (anio) {
             document.getElementById('anioTrabajo').value = anio;
         }
     }
     
-    // Estudiantes
     document.getElementById('nombre1').value = data.Nombre_1 || '';
     document.getElementById('cuenta1').value = data.N_Cuenta_1 || '';
     document.getElementById('nombre2').value = data.Nombre_2 || '';
@@ -838,28 +836,23 @@ function setupRegistroForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Obtener mes y año
         const mes = document.getElementById('mesTrabajo').value;
         const anio = document.getElementById('anioTrabajo').value;
 
-        // Validar
         if (!mes || !anio) {
             alert('Seleccione mes y año válidos');
             return;
         }
 
-        // Mapear mes a texto (EJ: "07" -> "JULIO")
         const meses = {
             '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL',
             '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO',
             '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE'
         };
 
-        // Formatear fecha como "JULIO DE 2025"
         const fechaTexto = `${meses[mes]} DE ${anio}`;
         document.getElementById('fechaTrabajo').value = fechaTexto;
 
-        // Crear objeto con los datos del formulario
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         const registroId = document.getElementById('registroId').value;
@@ -870,7 +863,6 @@ function setupRegistroForm() {
             
             let response;
             if (registroId) {
-                // Actualizar registro existente
                 response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
                     method: 'PUT',
                     headers: {
@@ -880,7 +872,6 @@ function setupRegistroForm() {
                     body: JSON.stringify(data)
                 });
             } else {
-                // Crear nuevo registro
                 response = await fetch('http://localhost:3000/api/registros/admin', {
                     method: 'POST',
                     headers: {
@@ -910,14 +901,11 @@ function setupRegistroForm() {
 // Actualizar paginación
 function updatePagination() {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const pagination = document.querySelector('.pagination');
     
-    // Actualizar estado de botones
     document.getElementById('firstPage').disabled = currentPage === 1;
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
     document.getElementById('lastPage').disabled = currentPage === totalPages || totalPages === 0;
     
-    // Actualizar números de página
     updatePageNumbers(currentPage);
 }

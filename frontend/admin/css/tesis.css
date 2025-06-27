@@ -1,4 +1,3 @@
-/* Variables CSS */
 :root {
     --primary-color: #3498db;
     --primary-dark: #2980b9;
@@ -7,6 +6,10 @@
     --warning-color: #f39c12;
     --light-color: #ecf0f1;
     --dark-color: #2c3e50;
+    --sidebar-color: #2c3e50;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-hover: rgba(255, 255, 255, 0.1);
+    --sidebar-active: rgba(255, 255, 255, 0.2);
     --text-color: #333;
     --text-light: #777;
     --border-color: #ddd;
@@ -28,74 +31,62 @@ body {
 
 .admin-container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 280px 1fr;
     min-height: 100vh;
-    padding-top: 60px; /* Para la barra superior fija */
-}
-
-/* Barra de navegación superior */
-.top-navbar {
-    background-color: #fff;
-    box-shadow: var(--shadow);
-    padding: 0 20px;
-    height: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-.navbar-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.sidebar-toggle {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #555;
     transition: var(--transition);
 }
 
-.sidebar-toggle:hover {
-    color: var(--primary-color);
+/* Panel lateral */
+.sidebar {
+    background: var(--sidebar-color);
+    color: white;
+    height: 100vh;
+    overflow-y: auto;
+    transition: var(--transition);
+    position: relative;
+    z-index: 1000;
 }
 
-.breadcrumbs {
-    color: var(--text-light);
-    font-size: 0.9rem;
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.breadcrumbs strong {
-    color: var(--text-color);
-    font-weight: 600;
-}
-
-.navbar-right {
+.logo {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 30px;
+    height: 30px;
+}
+
+.logo span {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .user-dropdown {
-    position: relative;
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    flex: 1;
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
 }
 
 .user-name {
@@ -105,100 +96,35 @@ body {
 
 .user-status {
     font-size: 0.7rem;
-    color: #666;
-}
-
-.user-status.active {
     color: var(--secondary-color);
 }
 
 .user-avatar {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--light-color);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     transition: var(--transition);
 }
 
-.user-dropdown:hover .user-avatar {
+.user-avatar:hover {
     border-color: var(--primary-color);
 }
 
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: #fff;
-    box-shadow: var(--shadow-lg);
-    border-radius: 5px;
-    padding: 10px 0;
-    width: 200px;
-    display: none;
-    z-index: 1001;
-}
-
-.user-dropdown:hover .dropdown-menu {
-    display: block;
-    animation: fadeIn 0.2s;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.dropdown-menu a {
-    display: block;
-    padding: 8px 15px;
-    color: var(--text-color);
-    text-decoration: none;
-    transition: background 0.2s;
-    font-size: 0.9rem;
-}
-
-.dropdown-menu a:hover {
-    background: #f5f5f5;
-    color: var(--primary-color);
-}
-
-.dropdown-menu i {
-    margin-right: 8px;
-    width: 20px;
-    text-align: center;
-    color: var(--text-light);
-}
-
-/* Sidebar */
-.sidebar {
-    background: var(--dark-color);
+.sidebar-toggle {
+    background: none;
+    border: none;
     color: white;
-    position: fixed;
-    top: 60px;
-    bottom: 0;
-    left: 0;
-    width: 250px;
-    z-index: 999;
+    font-size: 1.2rem;
+    cursor: pointer;
     transition: var(--transition);
-    overflow-y: auto;
+    padding: 5px;
+    margin-left: 10px;
 }
 
-.sidebar .logo {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar .logo img {
-    width: 30px;
-    height: 30px;
-}
-
-.sidebar .logo span {
-    font-weight: 600;
-    font-size: 1.1rem;
+.sidebar-toggle:hover {
+    color: var(--primary-color);
 }
 
 .sidebar nav ul {
@@ -212,20 +138,19 @@ body {
     align-items: center;
     gap: 10px;
     padding: 12px 20px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--sidebar-text);
     text-decoration: none;
     transition: var(--transition);
     border-left: 3px solid transparent;
 }
 
 .sidebar nav li a:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--sidebar-hover);
     color: white;
-    border-left-color: rgba(255, 255, 255, 0.2);
 }
 
 .sidebar nav li.active a {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--sidebar-active);
     color: white;
     border-left-color: var(--primary-color);
 }
@@ -233,6 +158,7 @@ body {
 .sidebar nav li i {
     width: 20px;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 /* Contenido principal */
@@ -240,6 +166,7 @@ body {
     grid-column: 2;
     padding: 20px;
     overflow-y: auto;
+    background-color: #f5f7fa;
 }
 
 .page-header {
@@ -257,6 +184,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--dark-color);
 }
 
 .page-actions {
@@ -376,6 +304,7 @@ body {
     background: #fff;
     font-size: 0.9rem;
     transition: var(--transition);
+    min-width: 120px;
 }
 
 .filter-group select:focus {
@@ -850,143 +779,7 @@ body {
     font-weight: 500;
 }
 
-/* Responsividad */
-@media (max-width: 1200px) {
-    .registros-table {
-        display: block;
-        overflow-x: auto;
-    }
-    
-    .column-imagen, 
-    .column-color, 
-    .column-cuenta {
-        display: none;
-    }
-}
-
-@media (max-width: 992px) {
-    .admin-container {
-        grid-template-columns: 70px 1fr;
-    }
-    
-    .sidebar .logo span {
-        display: none;
-    }
-    
-    .sidebar nav li a span {
-        display: none;
-    }
-    
-    .sidebar nav li a {
-        justify-content: center;
-        padding: 15px 0;
-    }
-    
-    .sidebar nav li a i {
-        font-size: 1.2rem;
-    }
-    
-    .filters-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filter-group {
-        width: 100%;
-    }
-    
-    .filter-group select {
-        width: 100%;
-    }
-    
-    .view-toggle {
-        align-self: flex-start;
-    }
-}
-
-@media (max-width: 768px) {
-    .top-navbar {
-        padding: 0 10px;
-    }
-    
-    .user-info {
-        display: none;
-    }
-    
-    .registros-table {
-        font-size: 0.8rem;
-    }
-    
-    .registros-table th, 
-    .registros-table td {
-        padding: 8px;
-    }
-    
-    .column-opcion, 
-    .column-fecha {
-        display: none;
-    }
-    
-    .table-footer {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-    
-    .pagination {
-        justify-content: center;
-    }
-    
-    .page-size {
-        align-self: center;
-    }
-    
-    .card-details-container {
-        flex-direction: column;
-    }
-    
-    .card-details-image {
-        flex: 0 0 200px;
-    }
-}
-
-@media (max-width: 576px) {
-    .breadcrumbs span:not(:last-child) {
-        display: none;
-    }
-    
-    .breadcrumbs strong::before {
-        content: "Trabajos";
-    }
-    
-    .registros-table {
-        font-size: 0.7rem;
-    }
-    
-    .column-carrera, 
-    .column-estudiante {
-        display: none;
-    }
-    
-    .page-numbers button:not(.active) {
-        display: none;
-    }
-    
-    .page-numbers span {
-        display: none;
-    }
-    
-    .page-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .view-toggle {
-        order: -1;
-    }
-}
-
-/* Estilos para el modal de nuevo registro */
+/* Estilos para el formulario de registro */
 .form-container {
     padding: 20px;
     margin-top: 15px;
@@ -1055,304 +848,123 @@ body {
     border-top: 1px solid #eee;
 }
 
+/* Estilos para cuando el sidebar está colapsado */
+.sidebar.collapsed {
+    width: 70px;
+    overflow: hidden;
+}
 
-/* Estilos para los botones de acción */
-.column-actions {
-    display: flex;
-    gap: 5px;
+.sidebar.collapsed .logo span,
+.sidebar.collapsed nav li span,
+.sidebar.collapsed .user-info,
+.sidebar.collapsed .sidebar-toggle {
+    display: none;
+}
+
+.sidebar.collapsed .logo {
     justify-content: center;
+    padding: 20px 0;
 }
 
-.btn-edit, .btn-delete {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: background-color 0.2s;
-}
-
-.btn-edit {
-    color: #3498db;
-}
-
-.btn-edit:hover {
-    background-color: rgba(52, 152, 219, 0.1);
-}
-
-.btn-delete {
-    color: #e74c3c;
-}
-
-.btn-delete:hover {
-    background-color: rgba(231, 76, 60, 0.1);
-}
-
-/* Estilos para el modal de registro */
-.modal-content .form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-row {
-    display: flex;
-    gap: 15px;
-}
-
-.form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.form-group textarea {
-    min-height: 60px;
-    resize: vertical;
-}
-
-.form-section {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.student-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-/* Estilos para tarjetas en vista de cuadrícula */
-.cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 10px;
-}
-
-.card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.card-image {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-}
-
-.card-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.card-title {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-body {
-    padding: 15px;
-}
-
-.card-field {
-    margin-bottom: 10px;
-}
-
-.card-label {
-    font-size: 12px;
-    color: #666;
-    display: block;
-}
-
-.card-value {
-    font-size: 14px;
-    color: #333;
-}
-
-.card-students {
-    margin-top: 15px;
-}
-
-.card-student {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    padding: 5px 0;
-    border-bottom: 1px solid #f5f5f5;
-}
-
-.student-account {
-    color: #666;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-}
-
-.card-date {
-    font-size: 12px;
-    color: #666;
-}
-
-.no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px;
-    color: #666;
-}
-
-/* Estilos para detalles de tarjeta en modal */
-.card-details-container {
-    display: flex;
-    gap: 20px;
-}
-
-.card-details-image {
-    width: 200px;
-    height: 200px;
-    background-color: #f5f5f5;
-    display: flex;
-    align-items: center;
+.sidebar.collapsed nav li a {
     justify-content: center;
-    border-radius: 4px;
-    overflow: hidden;
+    padding: 15px 0;
 }
 
-.card-details-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+.sidebar.collapsed nav li i {
+    font-size: 1.2rem;
 }
 
-.no-image {
-    color: #999;
-    font-style: italic;
-}
-
-.card-details-content {
-    flex: 1;
-}
-
-.details-row {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.details-label {
-    width: 120px;
-    font-weight: 500;
-    color: #555;
-}
-
-.details-value {
-    flex: 1;
-}
-
-.details-section-title {
-    margin: 20px 0 10px 0;
-    font-size: 16px;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
-
-.details-students, .details-accounts {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.details-student, .details-account {
-    padding: 5px;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.no-data {
-    color: #999;
-    font-style: italic;
-    font-size: 14px;
-}
-
-
-/* Estilos para tarjetas con botón de edición */
-.card {
-    position: relative; /* Para posicionar el botón */
-}
-
-.card-edit-btn {
-    position: absolute;
+/* Botón de menú para móviles */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
     top: 10px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.8);
+    left: 10px;
+    z-index: 1001;
+    background: var(--primary-color);
+    color: white;
     border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
     cursor: pointer;
-    z-index: 2;
-    color: #3498db;
-    transition: all 0.3s;
 }
 
-.card-edit-btn:hover {
-    background: #3498db;
-    color: white;
-    transform: scale(1.1);
+/* Responsividad */
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        transition: left 0.3s ease;
+    }
+    
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
 }
 
-.card-no-image {
-    height: 150px;
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ccc;
-    font-size: 2rem;
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-group select {
+        width: 100%;
+    }
+    
+    .page-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .view-toggle {
+        order: -1;
+    }
+}
+
+@media (max-width: 576px) {
+    .registros-table {
+        font-size: 0.8rem;
+    }
+    
+    .registros-table th, 
+    .registros-table td {
+        padding: 8px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .card-details-container {
+        flex-direction: column;
+    }
+    
+    .card-details-image {
+        flex: 0 0 200px;
+        width: 100%;
+    }
 }
