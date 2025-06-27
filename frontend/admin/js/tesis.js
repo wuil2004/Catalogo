@@ -4,6 +4,11 @@ let itemsPerPage = 10;
 let totalItems = 0;
 let allData = [];
 let currentData = [];
+
+let originalData = [];  // Datos originales (nunca se modifican)
+let filteredData = [];  // Datos filtrados (copia para trabajar)
+
+
 let currentView = 'table'; // 'table' o 'cards'
 
 // Inicialización al cargar el DOM
@@ -464,6 +469,7 @@ function displayTable(data) {
 }
 
 // Mostrar datos en tarjetas
+// Función para mostrar datos en tarjetas (actualizada con botón de edición)
 function displayCards(data) {
     const container = document.getElementById('cardsViewContainer');
     container.innerHTML = '';
@@ -476,13 +482,20 @@ function displayCards(data) {
     data.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.onclick = () => showCardDetails(item);
-
+        
+        // Contenido de la tarjeta con botón de edición
         card.innerHTML = `
-            ${item.imagen ? `<img src="${item.imagen}" class="card-image" alt="Trabajo">` : ''}
+            <div class="card-edit-btn" onclick="event.stopPropagation(); editRegistro(${item.N_de_Registro})" title="Editar">
+                <i class="fas fa-edit"></i>
+            </div>
+            
+            ${item.imagen ? `<img src="${item.imagen}" class="card-image" alt="Trabajo">` : 
+              '<div class="card-no-image"><i class="fas fa-image"></i></div>'}
+            
             <div class="card-header">
                 <h3 class="card-title">${item.Titulo || 'Sin título'}</h3>
             </div>
+            
             <div class="card-body">
                 <div class="card-field">
                     <span class="card-label">Código</span>
@@ -517,12 +530,15 @@ function displayCards(data) {
                     </div>` : ''}
                 </div>
             </div>
+            
             <div class="card-footer">
                 <span class="card-date">${item.Fecha_del_Trabajo || 'Sin fecha'}</span>
-                <span class="card-color" style="background: ${getColorCode(item.Color)}; width: 20px; height: 20px; border-radius: 50%; display: inline-block;"></span>
+                <span class="card-color" style="background: ${getColorCode(item.Color)}"></span>
             </div>
         `;
 
+        // Mantener el evento de clic para mostrar detalles
+        card.addEventListener('click', () => showCardDetails(item));
         container.appendChild(card);
     });
 }

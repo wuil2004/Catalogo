@@ -1316,3 +1316,43 @@ body {
     font-style: italic;
     font-size: 14px;
 }
+
+
+/* Estilos para tarjetas con botón de edición */
+.card {
+    position: relative; /* Para posicionar el botón */
+}
+
+.card-edit-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    color: #3498db;
+    transition: all 0.3s;
+}
+
+.card-edit-btn:hover {
+    background: #3498db;
+    color: white;
+    transform: scale(1.1);
+}
+
+.card-no-image {
+    height: 150px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 2rem;
+}
