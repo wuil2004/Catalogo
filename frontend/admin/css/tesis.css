@@ -50,6 +50,8 @@ body {
 .sidebar-header {
     padding: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
 }
 
 .logo {
@@ -72,8 +74,8 @@ body {
 .user-controls {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
+    justify-content: center;
+    width: 100%;
 }
 
 .user-dropdown {
@@ -851,7 +853,49 @@ body {
 /* Estilos para cuando el sidebar está colapsado */
 .sidebar.collapsed {
     width: 70px;
-    overflow: hidden;
+}
+
+.sidebar.collapsed .user-controls {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.sidebar.collapsed .user-avatar {
+    margin-bottom: 10px;
+}
+
+
+
+/* Ajustar el main content cuando el sidebar está colapsado */
+.sidebar.collapsed + .main-content {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+}
+
+/* Para móviles cuando el sidebar está oculto */
+@media (max-width: 992px) {
+    .sidebar:not(.show) + .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* Asegurar que la tabla ocupe todo el espacio */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.registros-table {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Ajustar el ancho de las columnas cuando el sidebar está colapsado */
+.sidebar.collapsed + .main-content .registros-container {
+    width: 100%;
+    max-width: none;
 }
 
 .sidebar.collapsed .logo span,
