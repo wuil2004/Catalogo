@@ -2,13 +2,9 @@
 let currentPage = 1;
 let itemsPerPage = 10;
 let totalItems = 0;
-let allData = [];
-let currentData = [];
-
 let originalData = [];  // Datos originales (nunca se modifican)
 let filteredData = [];  // Datos filtrados (copia para trabajar)
-
-
+let currentData = [];   // Datos de la página actual
 let currentView = 'table'; // 'table' o 'cards'
 
 // Inicialización al cargar el DOM
@@ -98,12 +94,7 @@ function setupEventListeners() {
     document.getElementById('carreraFilter').addEventListener('change', applyFilters);
     document.getElementById('fechaFilter').addEventListener('change', applyFilters);
 
-    document.getElementById('resetFilters').addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('carreraFilter').value = '';
-        document.getElementById('fechaFilter').value = '';
-        applyFilters();
-    });
+    document.getElementById('resetFilters').addEventListener('click', resetFilters);
 
     // Cambio de vista
     document.getElementById('tableViewBtn').addEventListener('click', () => {
@@ -132,6 +123,21 @@ function setupEventListeners() {
 
     // Nuevo registro
     document.getElementById('newWorkBtn').addEventListener('click', () => showRegistroModal('create'));
+}
+
+// Resetear filtros
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('carreraFilter').value = '';
+    document.getElementById('fechaFilter').value = '';
+    
+    // Restaurar datos originales
+    filteredData = [...originalData];
+    totalItems = filteredData.length;
+    currentPage = 1;
+    
+    updatePagination();
+    displayPage(currentPage);
 }
 
 // Configurar modales
@@ -221,8 +227,9 @@ async function loadRegistros() {
 
         if (!response.ok) throw new Error('Error al cargar datos');
 
-        allData = await response.json();
-        totalItems = allData.length;
+        originalData = await response.json();
+        filteredData = [...originalData];
+        totalItems = filteredData.length;
         
         // Llenar filtros
         fillFilters();
@@ -243,15 +250,19 @@ function fillFilters() {
     const carreraFilter = document.getElementById('carreraFilter');
     const fechaFilter = document.getElementById('fechaFilter');
     
+    // Limpiar opciones existentes (excepto la primera)
+    while (carreraFilter.options.length > 1) carreraFilter.remove(1);
+    while (fechaFilter.options.length > 1) fechaFilter.remove(1);
+    
     // Obtener valores únicos
-    const carreras = [...new Set(allData.map(item => item.Carrera))].filter(Boolean);
-    const fechas = [...new Set(allData.map(item => {
+    const carreras = [...new Set(originalData.map(item => item.Carrera))].filter(Boolean);
+    const fechas = [...new Set(originalData.map(item => {
         if (item.Fecha_del_Trabajo) {
             const parts = item.Fecha_del_Trabajo.split(' ');
             return parts[parts.length - 1]; // Obtener el año
         }
         return null;
-    }))].filter(Boolean);
+    }))].filter(Boolean).sort((a, b) => b - a); // Ordenar de más reciente a más antiguo
     
     // Llenar filtro de carreras
     carreras.forEach(carrera => {
@@ -276,9 +287,10 @@ function applyFilters() {
     const carrera = document.getElementById('carreraFilter').value;
     const fecha = document.getElementById('fechaFilter').value;
 
-    let filteredData = [...allData];
+    // Siempre empezar con los datos originales
+    filteredData = [...originalData];
 
-    // Aplicar filtros
+    // Aplicar filtros sobre la copia
     if (searchTerm) {
         filteredData = filteredData.filter(item =>
             (item.Titulo && item.Titulo.toLowerCase().includes(searchTerm)) ||
@@ -298,9 +310,8 @@ function applyFilters() {
         );
     }
 
-    // Actualizar datos mostrados
-    allData = filteredData;
-    totalItems = allData.length;
+    // Actualizar con los datos filtrados
+    totalItems = filteredData.length;
     currentPage = 1;
     updatePagination();
     displayPage(currentPage);
@@ -310,7 +321,7 @@ function applyFilters() {
 function displayPage(page) {
     const start = (page - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    currentData = allData.slice(start, end);
+    currentData = filteredData.slice(start, end);
 
     // Actualizar la vista según el modo actual
     if (currentView === 'table') {
@@ -453,11 +464,6 @@ function displayTable(data) {
                 <button class="btn-edit" onclick="editRegistro(${registro.N_de_Registro})" title="Editar">
                     <i class="fas fa-edit"></i>
                 </button>
-                <!--botn de elimar restringido a admin
-                <button class="btn-delete" onclick="deleteRegistro(${registro.N_de_Registro})" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-                -->
             </td>
         `;
 
@@ -469,7 +475,6 @@ function displayTable(data) {
 }
 
 // Mostrar datos en tarjetas
-// Función para mostrar datos en tarjetas (actualizada con botón de edición)
 function displayCards(data) {
     const container = document.getElementById('cardsViewContainer');
     container.innerHTML = '';
@@ -483,7 +488,6 @@ function displayCards(data) {
         const card = document.createElement('div');
         card.className = 'card';
         
-        // Contenido de la tarjeta con botón de edición
         card.innerHTML = `
             <div class="card-edit-btn" onclick="event.stopPropagation(); editRegistro(${item.N_de_Registro})" title="Editar">
                 <i class="fas fa-edit"></i>
@@ -537,7 +541,6 @@ function displayCards(data) {
             </div>
         `;
 
-        // Mantener el evento de clic para mostrar detalles
         card.addEventListener('click', () => showCardDetails(item));
         container.appendChild(card);
     });
@@ -727,7 +730,7 @@ function showRegistroModal(mode = 'create', registroData = null) {
 
 // Función para llenar el formulario con datos
 function populateForm(data) {
-    console.log('Datos recibidos para formulario:', data); // Para depuración
+    console.log('Datos recibidos para formulario:', data);
     
     // Campos básicos
     document.getElementById('registroId').value = data.N_de_Registro || '';
@@ -735,7 +738,7 @@ function populateForm(data) {
     document.getElementById('titulo').value = data.Titulo || '';
     document.getElementById('imagen').value = data.imagen || '';
     
-    // Carrera - con verificación de opciones
+    // Carrera
     if (data.Carrera) {
         const carreraSelect = document.getElementById('carrera');
         for (let i = 0; i < carreraSelect.options.length; i++) {
@@ -746,7 +749,7 @@ function populateForm(data) {
         }
     }
     
-    // Opción de titulación - con verificación de opciones
+    // Opción de titulación
     if (data.Opcion_de_Titulacion) {
         const opcionSelect = document.getElementById('opcionTitulacion');
         for (let i = 0; i < opcionSelect.options.length; i++) {
@@ -757,7 +760,7 @@ function populateForm(data) {
         }
     }
     
-    // Color - con verificación de opciones
+    // Color
     if (data.Color) {
         const colorSelect = document.getElementById('color');
         for (let i = 0; i < colorSelect.options.length; i++) {
@@ -818,17 +821,6 @@ async function editRegistro(registroId) {
         }
         
         const registroData = await response.json();
-        console.log('Datos del registro para editar:', registroData); // Depuración
-        
-        // Verificar campos críticos
-        if (!registroData.Carrera || !registroData.Opcion_de_Titulacion || !registroData.Fecha_del_Trabajo) {
-            console.warn('Faltan campos importantes en los datos:', {
-                Carrera: registroData.Carrera,
-                Opcion: registroData.Opcion_de_Titulacion,
-                Fecha: registroData.Fecha_del_Trabajo
-            });
-        }
-        
         showRegistroModal('edit', registroData);
         
     } catch (error) {
@@ -838,33 +830,7 @@ async function editRegistro(registroId) {
         hideLoading();
     }
 }
-/*
-// Función para eliminar un registro
-async function deleteRegistro(registroId) {
-    if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
-    
-    try {
-        showLoading();
-        
-        const token = localStorage.getItem('adminToken');
-        const response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (!response.ok) throw new Error('Error al eliminar registro');
-        
-        await loadRegistros();
-        alert('Registro eliminado correctamente');
-        
-    } catch (error) {
-        console.error('Error al eliminar registro:', error);
-        alert('Error al eliminar el registro');
-    } finally {
-        hideLoading();
-    }
-}
-*/
+
 // Configurar el formulario de registro
 function setupRegistroForm() {
     const form = document.getElementById('registroForm');
@@ -891,7 +857,7 @@ function setupRegistroForm() {
 
         // Formatear fecha como "JULIO DE 2025"
         const fechaTexto = `${meses[mes]} DE ${anio}`;
-        document.getElementById('fechaTrabajo').value = fechaTexto; // Asignar al hidden input
+        document.getElementById('fechaTrabajo').value = fechaTexto;
 
         // Crear objeto con los datos del formulario
         const formData = new FormData(form);
