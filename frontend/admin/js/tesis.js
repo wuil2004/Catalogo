@@ -448,9 +448,11 @@ function displayTable(data) {
                 <button class="btn-edit" onclick="editRegistro(${registro.N_de_Registro})" title="Editar">
                     <i class="fas fa-edit"></i>
                 </button>
+                <!--botn de elimar restringido a admin
                 <button class="btn-delete" onclick="deleteRegistro(${registro.N_de_Registro})" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
+                -->
             </td>
         `;
 
@@ -820,7 +822,7 @@ async function editRegistro(registroId) {
         hideLoading();
     }
 }
-
+/*
 // Función para eliminar un registro
 async function deleteRegistro(registroId) {
     if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
@@ -846,7 +848,7 @@ async function deleteRegistro(registroId) {
         hideLoading();
     }
 }
-
+*/
 // Configurar el formulario de registro
 function setupRegistroForm() {
     const form = document.getElementById('registroForm');
