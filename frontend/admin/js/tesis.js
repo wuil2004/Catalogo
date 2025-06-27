@@ -97,10 +97,6 @@ function setupEventListeners() {
         document.getElementById('searchInput').value = '';
         document.getElementById('carreraFilter').value = '';
         document.getElementById('fechaFilter').value = '';
-        document.getElementById('opcionFilter').value = '';
-        document.getElementById('colorFilter').value = '';
-        document.getElementById('fechaInicio').value = '';
-        document.getElementById('fechaFin').value = '';
         applyFilters();
     });
 
@@ -129,58 +125,39 @@ function setupEventListeners() {
         window.location.href = '/admin/index.html';
     });
 
-    document.querySelector('.btn-primary').addEventListener('click', showNewRegistroModal);
+    // Nuevo registro
+    document.getElementById('newWorkBtn').addEventListener('click', () => showRegistroModal('create'));
 }
 
 // Configurar modales
 function setupModals() {
-    const newRegistroModal = document.getElementById('newRegistroModal');
-    const closeNewRegistroModal = newRegistroModal.querySelector('.close-modal');
-
-    closeNewRegistroModal.onclick = () => newRegistroModal.style.display = 'none';
+    const modals = document.querySelectorAll('.modal');
+    
+    modals.forEach(modal => {
+        const closeBtn = modal.querySelector('.close-modal');
+        if (closeBtn) {
+            closeBtn.onclick = () => modal.style.display = 'none';
+        }
+    });
 
     // Configurar el formulario
-    setupNewRegistroForm();
-
-    // Modal de texto
-    const textModal = document.getElementById('textModal');
-    const closeTextModal = textModal.querySelector('.close-modal');
-
-    closeTextModal.onclick = () => textModal.style.display = 'none';
-
-    // Modal de imagen
-    const imageModal = document.getElementById('imageModal');
-    const closeImageModal = imageModal.querySelector('.close-modal');
-
-    closeImageModal.onclick = () => imageModal.style.display = 'none';
-
-    // Modal de detalles de tarjeta
-    const cardDetailsModal = document.getElementById('cardDetailsModal');
-    const closeCardDetails = cardDetailsModal.querySelector('.close-modal');
-
-    closeCardDetails.onclick = () => cardDetailsModal.style.display = 'none';
+    setupRegistroForm();
 
     // Cerrar modales al hacer clic fuera
     window.onclick = (event) => {
-        if (event.target === textModal) textModal.style.display = 'none';
-        if (event.target === imageModal) imageModal.style.display = 'none';
-        if (event.target === newRegistroModal) newRegistroModal.style.display = 'none';
-        if (event.target === document.getElementById('advancedFiltersModal')) {
-            document.getElementById('advancedFiltersModal').style.display = 'none';
-        }
-        if (event.target === cardDetailsModal) {
-            cardDetailsModal.style.display = 'none';
-        }
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     };
 
     // Cerrar modales con ESC
     window.onkeydown = (event) => {
         if (event.key === 'Escape') {
-            textModal.style.display = 'none';
-            imageModal.style.display = 'none';
-            newRegistroModal.style.display = 'none';
-            document.getElementById('advancedFiltersModal').style.display = 'none';
-            document.getElementById('cardDetailsModal').style.display = 'none';
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
         }
     };
 }
@@ -241,14 +218,51 @@ async function loadRegistros() {
 
         allData = await response.json();
         totalItems = allData.length;
+        
+        // Llenar filtros
+        fillFilters();
+        
         updatePagination();
         displayPage(currentPage);
 
     } catch (error) {
         console.error('Error cargando registros:', error);
+        alert('Error al cargar los registros');
     } finally {
         hideLoading();
     }
+}
+
+// Llenar filtros con datos disponibles
+function fillFilters() {
+    const carreraFilter = document.getElementById('carreraFilter');
+    const fechaFilter = document.getElementById('fechaFilter');
+    
+    // Obtener valores únicos
+    const carreras = [...new Set(allData.map(item => item.Carrera))].filter(Boolean);
+    const fechas = [...new Set(allData.map(item => {
+        if (item.Fecha_del_Trabajo) {
+            const parts = item.Fecha_del_Trabajo.split(' ');
+            return parts[parts.length - 1]; // Obtener el año
+        }
+        return null;
+    }))].filter(Boolean);
+    
+    // Llenar filtro de carreras
+    carreras.forEach(carrera => {
+        const option = document.createElement('option');
+        option.value = carrera;
+        option.textContent = carrera;
+        carreraFilter.appendChild(option);
+    });
+    
+    // Llenar filtro de fechas
+    fechas.forEach(fecha => {
+        const option = document.createElement('option');
+        option.value = fecha;
+        option.textContent = fecha;
+        fechaFilter.appendChild(option);
+    });
 }
 
 // Aplicar filtros
@@ -256,10 +270,6 @@ function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const carrera = document.getElementById('carreraFilter').value;
     const fecha = document.getElementById('fechaFilter').value;
-    const opcion = document.getElementById('opcionFilter').value;
-    const color = document.getElementById('colorFilter').value;
-    const fechaInicio = document.getElementById('fechaInicio').value;
-    const fechaFin = document.getElementById('fechaFin').value;
 
     let filteredData = [...allData];
 
@@ -280,28 +290,6 @@ function applyFilters() {
     if (fecha) {
         filteredData = filteredData.filter(item =>
             item.Fecha_del_Trabajo && item.Fecha_del_Trabajo.includes(fecha)
-        );
-    }
-
-    if (opcion) {
-        filteredData = filteredData.filter(item => item.Opcion_de_Titulacion === opcion);
-    }
-
-    if (color) {
-        filteredData = filteredData.filter(item =>
-            item.Color && item.Color.toLowerCase() === color.toLowerCase()
-        );
-    }
-
-    if (fechaInicio) {
-        filteredData = filteredData.filter(item =>
-            item.Fecha_del_Trabajo && item.Fecha_del_Trabajo >= fechaInicio
-        );
-    }
-
-    if (fechaFin) {
-        filteredData = filteredData.filter(item =>
-            item.Fecha_del_Trabajo && item.Fecha_del_Trabajo <= fechaFin
         );
     }
 
@@ -404,7 +392,7 @@ function displayTable(data) {
 
     if (data.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = `<td colspan="14" style="text-align: center;">No se encontraron registros</td>`;
+        row.innerHTML = `<td colspan="15" style="text-align: center;">No se encontraron registros</td>`;
         tbody.appendChild(row);
         return;
     }
@@ -456,6 +444,14 @@ function displayTable(data) {
             <td>${registro.Fecha_del_Trabajo || 'N/A'}</td>
             <td>${registro.Color || 'N/A'}</td>
             <td>${formatImage(registro.imagen)}</td>
+            <td class="column-actions">
+                <button class="btn-edit" onclick="editRegistro(${registro.N_de_Registro})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-delete" onclick="deleteRegistro(${registro.N_de_Registro})" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
         `;
 
         tbody.appendChild(row);
@@ -633,7 +629,11 @@ function getColorCode(colorName) {
         'verde': '#00ff00',
         'amarillo': '#ffff00',
         'negro': '#000000',
-        'blanco': '#ffffff'
+        'blanco': '#ffffff',
+        'gris oxford': '#808080',
+        'cafe': '#964B00',
+        'vino': '#722F37',
+        'gris': '#808080'
     };
     return colors[colorName?.toLowerCase()] || '#cccccc';
 }
@@ -678,22 +678,178 @@ window.showFullImage = function (imageUrl) {
     modal.style.display = 'block';
 };
 
-// Mostrar modal para nuevo registro
-function showNewRegistroModal() {
-    const modal = document.getElementById('newRegistroModal');
+// Mostrar modal para nuevo/editar registro
+function showRegistroModal(mode = 'create', registroData = null) {
+    const modal = document.getElementById('registroModal');
+    const form = document.getElementById('registroForm');
+    const title = document.getElementById('modalRegistroTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Resetear el formulario
+    form.reset();
+    
+    if (mode === 'create') {
+        title.innerHTML = '<i class="fas fa-plus"></i> Nuevo Trabajo de Titulación';
+        submitBtn.textContent = 'Guardar Trabajo';
+        document.getElementById('registroId').value = '';
+        
+        // Configurar fecha actual por defecto
+        const today = new Date();
+        document.getElementById('anioTrabajo').value = today.getFullYear();
+    } else if (mode === 'edit' && registroData) {
+        title.innerHTML = '<i class="fas fa-edit"></i> Editar Trabajo de Titulación';
+        submitBtn.textContent = 'Actualizar Trabajo';
+        
+        // Llenar el formulario con los datos del registro
+        populateForm(registroData);
+    }
+    
     modal.style.display = 'block';
-
-    // Configurar fecha actual por defecto
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fechaTrabajo').value = today;
-
-    // Limpiar el formulario
-    document.getElementById('newRegistroForm').reset();
 }
 
-// Configurar el formulario de nuevo registro
-function setupNewRegistroForm() {
-    const form = document.getElementById('newRegistroForm');
+// Función para llenar el formulario con datos
+function populateForm(data) {
+    console.log('Datos recibidos para formulario:', data); // Para depuración
+    
+    // Campos básicos
+    document.getElementById('registroId').value = data.N_de_Registro || '';
+    document.getElementById('nImpresoDigital').value = data.N_Impreso_Digital || '';
+    document.getElementById('titulo').value = data.Titulo || '';
+    document.getElementById('imagen').value = data.imagen || '';
+    
+    // Carrera - con verificación de opciones
+    if (data.Carrera) {
+        const carreraSelect = document.getElementById('carrera');
+        for (let i = 0; i < carreraSelect.options.length; i++) {
+            if (carreraSelect.options[i].value === data.Carrera) {
+                carreraSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    
+    // Opción de titulación - con verificación de opciones
+    if (data.Opcion_de_Titulacion) {
+        const opcionSelect = document.getElementById('opcionTitulacion');
+        for (let i = 0; i < opcionSelect.options.length; i++) {
+            if (opcionSelect.options[i].value === data.Opcion_de_Titulacion) {
+                opcionSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    
+    // Color - con verificación de opciones
+    if (data.Color) {
+        const colorSelect = document.getElementById('color');
+        for (let i = 0; i < colorSelect.options.length; i++) {
+            if (colorSelect.options[i].value === data.Color) {
+                colorSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    
+    // Procesar fecha (formato: "MES DE AÑO")
+    if (data.Fecha_del_Trabajo) {
+        const [mesTexto, , anio] = data.Fecha_del_Trabajo.split(' ');
+        const meses = {
+            'ENERO': '01', 'FEBRERO': '02', 'MARZO': '03', 'ABRIL': '04',
+            'MAYO': '05', 'JUNIO': '06', 'JULIO': '07', 'AGOSTO': '08',
+            'SEPTIEMBRE': '09', 'OCTUBRE': '10', 'NOVIEMBRE': '11', 'DICIEMBRE': '12'
+        };
+        
+        // Mes
+        if (mesTexto && meses[mesTexto]) {
+            const mesSelect = document.getElementById('mesTrabajo');
+            mesSelect.value = meses[mesTexto];
+        }
+        
+        // Año
+        if (anio) {
+            document.getElementById('anioTrabajo').value = anio;
+        }
+    }
+    
+    // Estudiantes
+    document.getElementById('nombre1').value = data.Nombre_1 || '';
+    document.getElementById('cuenta1').value = data.N_Cuenta_1 || '';
+    document.getElementById('nombre2').value = data.Nombre_2 || '';
+    document.getElementById('cuenta2').value = data.N_Cuenta_2 || '';
+    document.getElementById('nombre3').value = data.Nombre_3 || '';
+    document.getElementById('cuenta3').value = data.N_Cuenta_3 || '';
+}
+
+// Función para cerrar el modal
+function closeRegistroModal() {
+    document.getElementById('registroModal').style.display = 'none';
+}
+
+// Función para editar un registro
+async function editRegistro(registroId) {
+    try {
+        showLoading();
+        
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error al cargar registro: ${response.status} ${response.statusText}`);
+        }
+        
+        const registroData = await response.json();
+        console.log('Datos del registro para editar:', registroData); // Depuración
+        
+        // Verificar campos críticos
+        if (!registroData.Carrera || !registroData.Opcion_de_Titulacion || !registroData.Fecha_del_Trabajo) {
+            console.warn('Faltan campos importantes en los datos:', {
+                Carrera: registroData.Carrera,
+                Opcion: registroData.Opcion_de_Titulacion,
+                Fecha: registroData.Fecha_del_Trabajo
+            });
+        }
+        
+        showRegistroModal('edit', registroData);
+        
+    } catch (error) {
+        console.error('Error al editar registro:', error);
+        alert(`Error al cargar el registro para editar: ${error.message}`);
+    } finally {
+        hideLoading();
+    }
+}
+
+// Función para eliminar un registro
+async function deleteRegistro(registroId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
+    
+    try {
+        showLoading();
+        
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Error al eliminar registro');
+        
+        await loadRegistros();
+        alert('Registro eliminado correctamente');
+        
+    } catch (error) {
+        console.error('Error al eliminar registro:', error);
+        alert('Error al eliminar el registro');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Configurar el formulario de registro
+function setupRegistroForm() {
+    const form = document.getElementById('registroForm');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -704,7 +860,7 @@ function setupNewRegistroForm() {
 
         // Validar
         if (!mes || !anio) {
-            console.error('Seleccione mes y año válidos');
+            alert('Seleccione mes y año válidos');
             return;
         }
 
@@ -722,26 +878,45 @@ function setupNewRegistroForm() {
         // Crear objeto con los datos del formulario
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
+        const registroId = document.getElementById('registroId').value;
 
         try {
             showLoading();
             const token = localStorage.getItem('adminToken');
-            const response = await fetch('http://localhost:3000/api/registros/admin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) throw new Error('Error al crear registro');
             
-            document.getElementById('newRegistroModal').style.display = 'none';
+            let response;
+            if (registroId) {
+                // Actualizar registro existente
+                response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                // Crear nuevo registro
+                response = await fetch('http://localhost:3000/api/registros/admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+            }
+
+            if (!response.ok) throw new Error(registroId ? 'Error al actualizar registro' : 'Error al crear registro');
+            
+            closeRegistroModal();
             await loadRegistros();
+            
+            alert(registroId ? 'Registro actualizado correctamente' : 'Registro creado correctamente');
 
         } catch (error) {
             console.error(error.message);
+            alert(error.message);
         } finally {
             hideLoading();
         }
