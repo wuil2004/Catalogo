@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #3498db;
-    --primary-dark: #2980b9;
+    --primary-color: #34db77;
+    --primary-dark: #29b935;
     --secondary-color: #2ecc71;
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
@@ -44,6 +44,10 @@ body {
     height: 100vh;
     overflow-y: auto;
     transition: width 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #1e5631; /* Cambiado a un verde más oscuro  si no lo elimino y regresa a azul*/
 }
 
 .sidebar.collapsed {
@@ -154,8 +158,15 @@ body {
     padding: 20px;
     overflow-y: auto;
     background-color: #f5f7fa;
-    width: 100%;
+    width: calc(100% - 280px);
     box-sizing: border-box;
+    margin-left: 280px;
+}
+
+/* Añade esto para cuando el sidebar esté colapsado */
+.sidebar.collapsed ~ .main-content {
+    width: calc(100% - 70px);
+    margin-left: 70px;
 }
 
 .page-header {
@@ -511,7 +522,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(52, 152, 219, 0.8);
+    background: rgba(52, 219, 166, 0.64);
     color: white;
     display: flex;
     align-items: center;
@@ -952,7 +963,7 @@ body {
     justify-content: center;
     cursor: pointer;
     z-index: 2;
-    color: #3498db;
+    color: #099953;
     transition: all 0.3s;
 }
 
