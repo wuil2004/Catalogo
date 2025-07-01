@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar autenticación y token válido
     try {
+        // Verificar autenticación
         const token = localStorage.getItem('adminToken');
         if (!token) throw new Error('No autenticado');
 
-        // Verificar token con el servidor
         const tokenValid = await verifyToken(token);
         if (!tokenValid) throw new Error('Token inválido');
 
@@ -20,24 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Error de autenticación:', error);
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        window.location.href = '/admin/index.html';
+        logout();
     }
 });
 
-async function verifyToken(token) {
-    try {
-        const response = await fetch('http://localhost:3000/api/admins/verify-token', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        return response.ok;
-    } catch (error) {
-        console.error('Error verificando token:', error);
-        return false;
-    }
-}
-
+// ====================== Funciones CRUD para Administradores ======================
 async function loadAdmins() {
     try {
         showLoading(true);
@@ -46,17 +32,13 @@ async function loadAdmins() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error al cargar administradores');
-        }
+        if (!response.ok) throw new Error(await response.text());
         
         const admins = await response.json();
         renderAdminsTable(admins);
         
     } catch (error) {
-        console.error('Error:', error);
-        showError(error.message);
+        showError(error.message || 'Error al cargar administradores');
     } finally {
         showLoading(false);
     }
@@ -64,100 +46,49 @@ async function loadAdmins() {
 
 function renderAdminsTable(admins) {
     const tableBody = document.querySelector('#adminsTable tbody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    if (admins.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay administradores registrados</td></tr>';
-        return;
-    }
-    
-    admins.forEach(admin => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${admin.id}</td>
-            <td>${admin.username}</td>
-            <td class="actions">
-                <button class="btn btn-primary edit-btn" data-id="${admin.id}">Editar</button>
-                <button class="btn btn-danger delete-btn" data-id="${admin.id}">Eliminar</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-    
-    // Agregar event listeners a los botones
-    addEditEventListeners();
-    addDeleteEventListeners();
-}
+    tableBody.innerHTML = admins.length === 0 
+        ? '<tr><td colspan="3">No hay administradores</td></tr>'
+        : admins.map(admin => `
+            <tr>
+                <td>${admin.id}</td>
+                <td>${admin.username}</td>
+                <td class="actions">
+                    <button class="btn btn-primary edit-btn" data-id="${admin.id}">Editar</button>
+                    <button class="btn btn-danger delete-btn" data-id="${admin.id}">Eliminar</button>
+                </td>
+            </tr>
+        `).join('');
 
-function addEditEventListeners() {
+    // Agregar event listeners
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const adminId = e.target.getAttribute('data-id');
-            openEditModal(adminId);
-        });
+        btn.addEventListener('click', (e) => openEditModal(e.target.dataset.id));
     });
-}
-
-function addDeleteEventListeners() {
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const adminId = e.target.getAttribute('data-id');
-            confirmDelete(adminId);
-        });
+        btn.addEventListener('click', (e) => confirmDelete(e.target.dataset.id));
     });
 }
 
 function setupAdminModal() {
     const modal = document.getElementById('adminModal');
     if (!modal) return;
-    
-    const addBtn = document.getElementById('addAdminBtn');
-    const closeBtn = modal.querySelector('.close');
-    
-    if (addBtn) {
-        addBtn.addEventListener('click', () => {
-            resetModalForm();
-            modal.style.display = 'block';
-        });
-    }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-    }
-    
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-    
-    const form = document.getElementById('adminForm');
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await saveAdmin();
-        });
-    }
-}
 
-function resetModalForm() {
-    const modal = document.getElementById('adminModal');
-    if (!modal) return;
-    
-    modal.querySelector('#modalTitle').textContent = 'Nuevo Administrador';
-    modal.querySelector('#adminId').value = '';
-    modal.querySelector('#adminUsername').value = '';
-    modal.querySelector('#adminPassword').value = '';
-    modal.querySelector('#adminPassword').required = true;
-    
-    const formError = modal.querySelector('#formError');
-    if (formError) {
-        formError.style.display = 'none';
-    }
+    // Botón "Nuevo Admin"
+    document.getElementById('addAdminBtn')?.addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Nuevo Administrador';
+        document.getElementById('adminForm').reset();
+        modal.style.display = 'block';
+    });
+
+    // Cerrar modal
+    modal.querySelector('.close').addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Enviar formulario
+    document.getElementById('adminForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await saveAdmin();
+    });
 }
 
 async function openEditModal(adminId) {
@@ -168,31 +99,16 @@ async function openEditModal(adminId) {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error al cargar administrador');
-        }
+        if (!response.ok) throw new Error(await response.text());
         
         const admin = await response.json();
-        const modal = document.getElementById('adminModal');
+        document.getElementById('modalTitle').textContent = 'Editar Administrador';
+        document.getElementById('adminId').value = admin.id;
+        document.getElementById('adminUsername').value = admin.username;
+        document.getElementById('adminPassword').required = false;
         
-        if (modal) {
-            modal.querySelector('#modalTitle').textContent = 'Editar Administrador';
-            modal.querySelector('#adminId').value = admin.id;
-            modal.querySelector('#adminUsername').value = admin.username;
-            modal.querySelector('#adminPassword').value = '';
-            modal.querySelector('#adminPassword').required = false;
-            
-            const formError = modal.querySelector('#formError');
-            if (formError) {
-                formError.style.display = 'none';
-            }
-            
-            modal.style.display = 'block';
-        }
-        
+        document.getElementById('adminModal').style.display = 'block';
     } catch (error) {
-        console.error('Error:', error);
         showError(error.message);
     } finally {
         showLoading(false);
@@ -201,97 +117,77 @@ async function openEditModal(adminId) {
 
 async function saveAdmin() {
     try {
-        const token = localStorage.getItem('adminToken');
         const form = document.getElementById('adminForm');
-        if (!form) throw new Error('Formulario no encontrado');
-        
-        const id = form.querySelector('#adminId').value;
-        const username = form.querySelector('#adminUsername').value.trim();
-        const password = form.querySelector('#adminPassword').value;
-        const formError = form.querySelector('#formError');
-        
-        // Validaciones
-        if (!username) throw new Error('El nombre de usuario es requerido');
-        if (!id && !password) throw new Error('La contraseña es requerida para nuevos administradores');
-        
-        const url = id ? `http://localhost:3000/api/admins/${id}` : 'http://localhost:3000/api/admins/register';
-        const method = id ? 'PUT' : 'POST';
-        
-        const body = { username };
-        if (password) body.password = password;
-        
-        const response = await fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error al guardar');
-        }
-        
+        const formData = {
+            id: form.adminId.value,
+            username: form.adminUsername.value.trim(),
+            password: form.adminPassword.value || undefined
+        };
+
+        if (!formData.username) throw new Error('Usuario es requerido');
+        if (!formData.id && !formData.password) throw new Error('Contraseña es requerida');
+
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(
+            formData.id ? `http://localhost:3000/api/admins/${formData.id}` : 'http://localhost:3000/api/admins/register',
+            {
+                method: formData.id ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            }
+        );
+
+        if (!response.ok) throw new Error(await response.text());
+
         document.getElementById('adminModal').style.display = 'none';
         await loadAdmins();
-        
+
     } catch (error) {
-        console.error('Error:', error);
-        const formError = document.getElementById('formError');
-        if (formError) {
-            formError.textContent = error.message;
-            formError.style.display = 'block';
-        }
+        document.getElementById('formError').textContent = error.message;
+        document.getElementById('formError').style.display = 'block';
     }
 }
 
 async function confirmDelete(adminId) {
+    if (!confirm('¿Eliminar este administrador?')) return;
+    
     try {
-        const currentAdmin = JSON.parse(localStorage.getItem('adminData'));
-        if (currentAdmin && currentAdmin.id === parseInt(adminId)) {
-            showError('No puedes eliminarte a ti mismo');
-            return;
-        }
-        
-        if (!confirm('¿Está seguro de eliminar este administrador?')) return;
-        
         showLoading(true);
         const token = localStorage.getItem('adminToken');
         const response = await fetch(`http://localhost:3000/api/admins/${adminId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error al eliminar');
-        }
-        
+
+        if (!response.ok) throw new Error(await response.text());
         await loadAdmins();
-        
+
     } catch (error) {
-        console.error('Error:', error);
         showError(error.message);
     } finally {
         showLoading(false);
     }
 }
 
+// ====================== Helpers ======================
 function showLoading(show) {
-    const loadingElement = document.getElementById('loadingMessage');
-    const tableElement = document.querySelector('.table-container');
-    
-    if (loadingElement) loadingElement.style.display = show ? 'block' : 'none';
-    if (tableElement) tableElement.style.display = show ? 'none' : 'block';
+    document.getElementById('loadingMessage').style.display = show ? 'block' : 'none';
+    document.querySelector('.table-container').style.display = show ? 'none' : 'block';
 }
 
 function showError(message) {
     const errorElement = document.getElementById('errorMessage');
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-        setTimeout(() => errorElement.style.display = 'none', 5000);
-    }
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    setTimeout(() => errorElement.style.display = 'none', 5000);
+}
+
+// Función compartida (repetida, ideal moverla a un archivo común)
+function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    window.location.href = '/admin/index.html';
 }

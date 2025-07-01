@@ -1,50 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/admin/css/tesis.css"> <!-- Usamos el mismo CSS -->
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="/admin/css/styles.css">
 </head>
-
 <body>
-    <!-- Contenedor principal -->
     <div class="admin-container">
-        <!-- Panel lateral -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="user-controls">
-                    <div class="user-dropdown">
-                        <img src="/admin/assets/images.png" alt="Usuario" class="user-avatar" id="userAvatar">
-                        <div class="user-info">
-                            <span class="user-name">Administrador</span>
-                            <span class="user-status active">En línea</span>
-                        </div>
-                    </div>
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                        <i class="fas fa-angle-left"></i>
-                    </button>
-                </div>
-            </div>
-            
+        <aside class="sidebar">
+            <div class="logo">Admin Panel</div>
             <nav>
                 <ul>
-                    <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                    <li><a href="tesis.html"><i class="fas fa-graduation-cap"></i> <span>Trabajos de titulación</span></a></li>
-                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> <span>Administradores</span></a></li>
-                    <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
+                    <li class="active"><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="tesis.html">Trabajos de titulacion</a></li>
+                    <li><a href="admins.html">Administradores</a></li>
+                    <li><a href="#" id="logoutBtn">Cerrar Sesión</a></li>
                 </ul>
             </nav>
         </aside>
-
         <main class="main-content">
-            <div class="page-header">
-                <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
-            </div>
-
-            <!-- Contenido del dashboard -->
+            <header class="header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <span id="currentUser"></span>
+                </div>
+            </header>
             <div class="content">
                 <div class="card">
                     <h2>Resumen del Sistema</h2>
@@ -54,115 +35,8 @@
             </div>
         </main>
     </div>
-
-    <!-- Loading overlay -->
-    <div class="loading-overlay">
-        <div class="spinner"></div>
-        <div class="loading-text">Cargando...</div>
-    </div>
-
-    <script src="/admin/js/auth.js"></script><br>
-    <script src="admin/js/admin.js"></script>
-    <script>
-        // Variables globales
-        let currentPage = 1;
-        let itemsPerPage = 10;
-        let totalItems = 0;
-
-        // Inicialización al cargar el DOM
-        document.addEventListener('DOMContentLoaded', async () => {
-            await verifyAuth();
-            setupEventListeners();
-            setupResponsive();
-            
-            // Agregar botón de menú para móviles
-            if (window.innerWidth <= 992) {
-                const mobileToggle = document.createElement('button');
-                mobileToggle.className = 'mobile-menu-toggle';
-                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                mobileToggle.addEventListener('click', toggleSidebar);
-                document.body.appendChild(mobileToggle);
-            }
-        });
-
-        // Configurar event listeners
-        function setupEventListeners() {
-            // Cerrar sesión
-            document.getElementById('logoutBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('adminToken');
-                window.location.href = '/admin/index.html';
-            });
-            
-            // Toggle sidebar con avatar
-            document.getElementById('userAvatar').addEventListener('click', toggleSidebar);
-            
-            // Toggle sidebar con botón
-            document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-            
-            // Redimensionamiento
-            window.addEventListener('resize', setupResponsive);
-        }
-
-        // Alternar sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const isMobile = window.innerWidth <= 992;
-            
-            if (isMobile) {
-                sidebar.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed');
-            }
-        }
-
-        // Configurar responsividad
-        function setupResponsive() {
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
-            if (window.innerWidth <= 992) {
-                if (!mobileToggle) {
-                    const newToggle = document.createElement('button');
-                    newToggle.className = 'mobile-menu-toggle';
-                    newToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                    newToggle.addEventListener('click', toggleSidebar);
-                    document.body.appendChild(newToggle);
-                } else {
-                    mobileToggle.style.display = 'block';
-                }
-            } else if (mobileToggle) {
-                mobileToggle.style.display = 'none';
-            }
-        }
-
-        // Verificar autenticación
-        async function verifyAuth() {
-            const token = localStorage.getItem('adminToken');
-            if (!token) {
-                window.location.href = '/admin/index.html';
-                return false;
-            }
-
-            try {
-                const response = await fetch('http://localhost:3000/api/admins/verify-token', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) {
-                    localStorage.removeItem('adminToken');
-                    window.location.href = '/admin/index.html';
-                    return false;
-                }
-                
-                const data = await response.json();
-                document.querySelector('.user-name').textContent = data.nombre || 'Administrador';
-                return true;
-            } catch (error) {
-                console.error('Error verificando token:', error);
-                localStorage.removeItem('adminToken');
-                window.location.href = '/admin/index.html';
-                return false;
-            }
-        }
-    </script>
+    
+    <script src="/admin/js/dashboard.js"></script>
+    <script src="/admin/js/auth.js"></script>
 </body>
 </html>
