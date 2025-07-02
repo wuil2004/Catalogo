@@ -78,7 +78,7 @@ async function loadAdmins() {
         if (!response.ok) throw new Error(await response.text());
         
         const admins = await response.json();
-        renderAdminsTable(admins);
+        renderAdminsCards(admins);
         
     } catch (error) {
         showError(error.message || 'Error al cargar administradores');
@@ -87,27 +87,52 @@ async function loadAdmins() {
     }
 }
 
-function renderAdminsTable(admins) {
-    const tableBody = document.querySelector('#adminsTable tbody');
-    tableBody.innerHTML = admins.length === 0 
-        ? '<tr><td colspan="3">No hay administradores</td></tr>'
-        : admins.map(admin => `
-            <tr>
-                <td>${admin.id}</td>
-                <td>${admin.username}</td>
-                <td class="actions">
-                    <button class="btn btn-primary edit-btn" data-id="${admin.id}">Editar</button>
-                    <button class="btn btn-danger delete-btn" data-id="${admin.id}">Eliminar</button>
-                </td>
-            </tr>
-        `).join('');
+function renderAdminsCards(admins) {
+    const container = document.getElementById('adminsCardsContainer');
+    
+    if (admins.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-user-shield"></i>
+                <h3>No hay administradores</h3>
+                <p>Agrega un nuevo administrador para comenzar</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = admins.map(admin => `
+        <div class="admin-card" data-id="${admin.id}">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h3>${admin.username}</h3>
+            </div>
+            <div class="card-body">
+                <div class="card-detail">
+                    <i class="fas fa-id-card"></i>
+                    <span>ID: ${admin.id}</span>
+                </div>
+                
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-primary btn-sm edit-btn" data-id="${admin.id}">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn btn-danger btn-sm delete-btn" data-id="${admin.id}">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    `).join('');
 
     // Agregar event listeners
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => openEditModal(e.target.dataset.id));
+        btn.addEventListener('click', (e) => openEditModal(e.target.closest('button').dataset.id));
     });
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => confirmDelete(e.target.dataset.id));
+        btn.addEventListener('click', (e) => confirmDelete(e.target.closest('button').dataset.id));
     });
 }
 
@@ -128,6 +153,11 @@ function setupAdminModal() {
         modal.style.display = 'none';
     });
 
+    // Botón cancelar
+    document.getElementById('cancelBtn')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
     // Cerrar al hacer clic fuera del modal
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -140,6 +170,40 @@ function setupAdminModal() {
         e.preventDefault();
         await saveAdmin();
     });
+}
+
+function setupConfirmModal() {
+    const modal = document.getElementById('confirmModal');
+    let currentAdminId = null;
+
+    // Configurar botones
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
+        if (currentAdminId) {
+            await deleteAdmin(currentAdminId);
+            modal.style.display = 'none';
+            currentAdminId = null;
+        }
+    });
+
+    // Cerrar al hacer clic fuera del modal
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            currentAdminId = null;
+        }
+    });
+
+    // Función para abrir el modal de confirmación
+    window.confirmDelete = (adminId) => {
+        currentAdminId = adminId;
+        document.getElementById('confirmMessage').textContent = 
+            `¿Estás seguro de eliminar este administrador? Esta acción no se puede deshacer.`;
+        modal.style.display = 'block';
+    };
 }
 
 async function openEditModal(adminId) {
@@ -203,9 +267,7 @@ async function saveAdmin() {
     }
 }
 
-async function confirmDelete(adminId) {
-    if (!confirm('¿Estás seguro de eliminar este administrador?')) return;
-    
+async function deleteAdmin(adminId) {
     try {
         showLoading(true);
         const token = localStorage.getItem('adminToken');
@@ -226,8 +288,8 @@ async function confirmDelete(adminId) {
 
 // ====================== Helpers ======================
 function showLoading(show) {
-    document.getElementById('loadingMessage').style.display = show ? 'block' : 'none';
-    document.querySelector('.table-container').style.display = show ? 'none' : 'block';
+    document.getElementById('loadingMessage').style.display = show ? 'flex' : 'none';
+    document.getElementById('adminsCardsContainer').style.display = show ? 'none' : 'grid';
 }
 
 function showError(message) {
@@ -257,14 +319,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (userNameElement) {
                 userNameElement.textContent = adminData.username;
             }
-            if (document.getElementById('currentUser')) {
-                document.getElementById('currentUser').textContent = `Bienvenido, ${adminData.username}`;
-            }
         }
+
+        // Configurar modales
+        setupAdminModal();
+        setupConfirmModal();
 
         // Cargar lista de administradores
         await loadAdmins();
-        setupAdminModal();
 
     } catch (error) {
         console.error('Error de autenticación:', error);

@@ -38,28 +38,31 @@
 
         <main class="main-content">
             <header class="header">
-                <h1>Administradores</h1>
-                <div class="user-info">
-                    <span id="currentUser"></span>
-                    <button id="addAdminBtn" class="btn btn-primary">+ Nuevo Admin</button>
+                <div class="header-title">
+                    <h1>Administradores</h1>
+                    <div class="breadcrumb">
+                        <span>Dashboard</span> / <span>Administradores</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar administrador..." id="searchAdmin">
+                    </div>
+                    <button id="addAdminBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Admin
+                    </button>
                 </div>
             </header>
+            
             <div class="content">
-                <div id="loadingMessage" class="loading-message">Cargando administradores...</div>
+                <div id="loadingMessage" class="loading-message">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando administradores...
+                </div>
                 <div id="errorMessage" class="error-message" style="display: none;"></div>
-                <div class="table-container">
-                    <table id="adminsTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Usuario</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos cargados por JavaScript -->
-                        </tbody>
-                    </table>
+                
+                <div class="cards-container" id="adminsCardsContainer">
+                    <!-- Cards serán generadas por JavaScript -->
                 </div>
             </div>
         </main>
@@ -82,8 +85,23 @@
                     <small class="form-text">(Obligatoria para nuevos, opcional para editar)</small>
                 </div>
                 <div id="formError" class="error-message" style="display: none;"></div>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content small">
+            <h2>Confirmar Eliminación</h2>
+            <p id="confirmMessage">¿Estás seguro de eliminar este administrador?</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
         </div>
     </div>
 
