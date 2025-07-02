@@ -4,21 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración</title>
-    <link rel="stylesheet" href="/admin/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/dashboard.css">
 </head>
 <body>
     <div class="admin-container">
-        <aside class="sidebar">
-            <div class="logo">Admin Panel</div>
+        <!-- Sidebar mejorado -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-controls">
+                    <div class="user-dropdown">
+                        <img src="/admin/assets/images.png" alt="Usuario" class="user-avatar" id="userAvatar">
+                        <div class="user-info">
+                            <span class="user-name">Administrador</span>
+                            <span class="user-status active">En línea</span>
+                        </div>
+                    </div>
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                </div>
+            </div>
+            
             <nav>
                 <ul>
-                    <li class="active"><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="tesis.html">Trabajos de titulacion</a></li>
-                    <li><a href="admins.html">Administradores</a></li>
-                    <li><a href="#" id="logoutBtn">Cerrar Sesión</a></li>
+                    <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="tesis.html"><i class="fas fa-graduation-cap"></i> <span>Trabajos de titulación</span></a></li>
+                    <li><a href="admins.html"><i class="fas fa-users-cog"></i> <span>Administradores</span></a></li>
+                    <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
                 </ul>
             </nav>
         </aside>
+
         <main class="main-content">
             <header class="header">
                 <h1>Dashboard</h1>
@@ -30,13 +47,13 @@
                 <div class="card">
                     <h2>Resumen del Sistema</h2>
                     <p>Bienvenido al panel de administración. Seleccione una opción del menú para comenzar.</p>
-                    <div id="dashboardStats"></div>
+                    <div id="dashboardStats" class="stats-grid"></div>
                 </div>
             </div>
         </main>
     </div>
     
-    <script src="/admin/js/dashboard.js"></script>
     <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/dashboard.js"></script>
 </body>
 </html>
