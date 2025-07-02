@@ -1,33 +1,60 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="no-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Administrativo</title>
+    <meta name="description" content="Panel de acceso administrativo para personal autorizado del TESJI">
+    <title>Acceso Administrativo | TESJI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/admin/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/admin/css/index.css">
+    <link rel="preload" href="/admin/assets/tesji.png" as="image">
 </head>
 <body>
     <div class="login-container">
-        <div class="login-box">
-            <img src="/admin/assets/tesji.png" alt="TESJI Logo" class="tesji-logo">
-            <h1>Acceso Administrativo</h1>
-            <form id="loginForm" action="" method="post">
+        <div class="login-box" role="document">
+            <div class="logo-container">
+                <img src="/admin/assets/tesji.png" alt="TESJI Logo" class="tesji-logo" width="120" height="120" loading="eager">
+                <h1>Acceso Administrativo</h1>
+            </div>
+            
+            <form id="loginForm" action="/admin/auth" method="post" novalidate>
                 <div class="form-group">
                     <label for="username">Usuario Admin</label>
-                    <input type="text" id="username" name="username" required autocomplete="username">
+                    <input type="text" id="username" name="username" required autocomplete="username" aria-describedby="usernameHelp">
+                    <small id="usernameHelp" class="form-help">Ingrese su nombre de usuario administrativo</small>
                 </div>
-                <div class="form-group">
+                <div class="form-group password-group">
                     <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" required autocomplete="current-password" minlength="8">
+                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña">👁️</button>
+                    </div>
                 </div>
-                <button type="submit" class="btn-login">Ingresar</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn-login">
+                        <span class="btn-text">Ingresar</span>
+                        <span class="btn-loader" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="form-links">
+                    <a href="/password-recovery" class="forgot-password">¿Olvidó su contraseña?</a>
+                </div>
             </form>
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            
+            <div id="errorMessage" class="error-message" role="alert" aria-live="assertive" style="display: none;"></div>
+            
             <div class="public-link">
-                <a href="/">← Volver al sitio público</a>
+                <a href="/" class="back-link">
+                    <span aria-hidden="true">←</span> Volver al sitio público
+                </a>
             </div>
         </div>
     </div>
-    <script src="/admin/js/auth.js"></script>
+    
+    <script src="/admin/js/auth.js" defer></script>
+    <script src="https://cdn.polyfill.io/v3/polyfill.min.js?features=default,es2015,es2016,es2017" crossorigin="anonymous"></script>
 </body>
 </html>
