@@ -8,20 +8,26 @@ let currentData = [];
 let currentView = 'table';
 
 // Inicialización al cargar el DOM
+// Cambia esta parte en el event listener DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
-    await verifyAuth();
-    setupEventListeners();
-    await loadRegistros();
-    setupModals();
-    setupResponsive();
-    
-    // Agregar botón de menú para móviles
-    if (window.innerWidth <= 992) {
-        const mobileToggle = document.createElement('button');
-        mobileToggle.className = 'mobile-menu-toggle';
-        mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        mobileToggle.addEventListener('click', toggleSidebar);
-        document.body.appendChild(mobileToggle);
+    const adminData = await verifyAuth();
+    if (adminData) {
+        // Actualiza el nombre del administrador en la interfaz
+        document.querySelector('.user-name').textContent = adminData.username || 'admin4';
+        
+        setupEventListeners();
+        await loadRegistros();
+        setupModals();
+        setupResponsive();
+        
+        // Agregar botón de menú para móviles
+        if (window.innerWidth <= 992) {
+            const mobileToggle = document.createElement('button');
+            mobileToggle.className = 'mobile-menu-toggle';
+            mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            mobileToggle.addEventListener('click', toggleSidebar);
+            document.body.appendChild(mobileToggle);
+        }
     }
 });
 
@@ -43,7 +49,10 @@ async function verifyAuth() {
             window.location.href = '/admin/index.html';
             return false;
         }
-        return true;
+        
+        // Devuelve los datos del administrador
+        const adminData = await response.json();
+        return adminData;
     } catch (error) {
         console.error('Error verificando token:', error);
         localStorage.removeItem('adminToken');
