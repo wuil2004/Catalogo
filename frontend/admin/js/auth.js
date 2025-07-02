@@ -64,19 +64,19 @@ class AuthController {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 
-                togglePassword.textContent = type === 'password' ? '👁️' : '🔒';
+                togglePassword.textContent = type === 'password' ? '👀' : '🙈';
                 togglePassword.setAttribute('aria-label', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
                 
                 passwordInput.focus();
             });
-            
+            /*
             passwordInput.addEventListener('blur', () => {
                 if (passwordInput.getAttribute('type') === 'text') {
                     passwordInput.setAttribute('type', 'password');
                     togglePassword.textContent = '👁️';
                     togglePassword.setAttribute('aria-label', 'Mostrar contraseña');
                 }
-            });
+            });*/
         }
     }
 
