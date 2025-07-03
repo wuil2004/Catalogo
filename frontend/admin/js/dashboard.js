@@ -95,7 +95,7 @@ function renderThesisCards(registros) {
         card.innerHTML = `
             <div class="card-image">
                 ${registro.imagen 
-                    ? `<img src="/uploads/${registro.imagen}" alt="Portada de tesis">`
+                    ? `<img src="${registro.imagen}" alt="Portada de tesis">`
                     : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
                 }
             </div>
