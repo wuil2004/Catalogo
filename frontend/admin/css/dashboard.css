@@ -291,7 +291,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 !important; /* Elimina el padding para que la imagen llene el espacio */
+     /*padding: 0 !important; /* Elimina el padding para que la imagen llene el espacio */
 }
 
 .flip-card-back {
@@ -301,18 +301,21 @@ body {
 
 /* Estilos para la imagen (frente) */
 .card-image {
-    height: 60%;
+    width: 100%; /* Ocupa todo el ancho */
+    height: 100%; /* Ocupa toda la altura */
     border-bottom: none;
-    margin-bottom: 10px;
+    margin-bottom: 0; /* Elimina el margen inferior */
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* Evita que la imagen se desborde */
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Cubre todo el espacio manteniendo proporciones */
+    object-position: center; /* Centra la imagen */
 }
 
 .card-image .placeholder {
