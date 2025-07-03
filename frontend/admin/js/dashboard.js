@@ -83,10 +83,17 @@ function renderThesisCards(registros) {
         const card = document.createElement('div');
         card.className = 'bibliographic-card';
         
+        // Obtener el código de color para el borde
+        const colorCode = getColorCode(registro.Color);
+        
+        // Aplicar el estilo del borde directamente
+        card.style.border = `4px solid ${colorCode}`;
+        card.style.borderRadius = '8px'; // Para mantener el borderRadius
+        
         // Contenido del frente (imagen o título)
         const frontContent = registro.imagen 
             ? `<div class="card-image"><img src="${registro.imagen}" alt="Portada de tesis"></div>`
-            : `<div class="card-title-front">${registro.Titulo}</div>`; // Nuevo estilo para título
+            : `<div class="card-title-front">${registro.Titulo}</div>`;
         
         card.innerHTML = `
             <div class="flip-card-inner">
@@ -111,7 +118,7 @@ function renderThesisCards(registros) {
                     <div class="detail-item"><span class="detail-label">Fecha:</span> <span class="detail-value">${registro.Fecha_del_Trabajo}</span></div>
                     <div class="detail-item"><span class="detail-label">Color:</span> 
                         <span class="detail-value">
-                            <span class="card-color" style="background: ${getColorCode(registro.Color)};"></span>
+                            <span class="card-color" style="background: ${colorCode};"></span>
                             ${registro.Color}
                         </span>
                     </div>
@@ -134,7 +141,7 @@ function getColorCode(color) {
         "VINO":" #4B0014",
         "ROJO":"	#8B0000",
         "GRIS":" #3A3A3A",
-        "Default": "#95a5a6"
+        "Default": "rgb(8, 114, 122)"
     };
     return colorMap[color] || colorMap.Default;
 }
