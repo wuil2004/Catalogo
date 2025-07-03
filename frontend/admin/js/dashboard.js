@@ -69,7 +69,7 @@ async function loadThesisCards() {
     }
 }
 
-// Función para renderizar las tarjetas
+// Función para renderizar las tarjetas giratorias
 function renderThesisCards(registros) {
     const container = document.getElementById('thesisCards');
     container.innerHTML = '';
@@ -79,7 +79,53 @@ function renderThesisCards(registros) {
         return;
     }
 
-    // Mapeo de colores
+    registros.forEach(registro => {
+        const card = document.createElement('div');
+        card.className = 'bibliographic-card';
+        
+        card.innerHTML = `
+            <div class="flip-card-inner">
+                <!-- Frente (imagen) -->
+                <div class="flip-card-front">
+                    <div class="card-image">
+                        ${registro.imagen 
+                            ? `<img src="${registro.imagen}" alt="Portada de tesis">`
+                            : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
+                        }
+                    </div>
+                    <h3 class="card-title">${registro.Titulo}</h3>
+                    <p class="card-author"><i class="fas fa-user"></i> ${registro.Nombre_1}</p>
+                </div>
+                
+                <!-- Reverso (detalles) -->
+                <div class="flip-card-back">
+                    <div class="detail-item"><span class="detail-label">ID:</span> <span class="detail-value">${registro.N_de_Registro}</span></div>
+                    <div class="detail-item"><span class="detail-label">N° Impreso/Digital:</span> <span class="detail-value">${registro.N_Impreso_Digital}</span></div>
+                    <div class="detail-item"><span class="detail-label">Carrera:</span> <span class="detail-value">${registro.Carrera}</span></div>
+                    <div class="detail-item"><span class="detail-label">Cuenta 1:</span> <span class="detail-value">${registro.N_Cuenta_1}</span></div>
+                    ${registro.N_Cuenta_2 ? `<div class="detail-item"><span class="detail-label">Cuenta 2:</span> <span class="detail-value">${registro.N_Cuenta_2}</span></div>` : ''}
+                    ${registro.N_Cuenta_3 ? `<div class="detail-item"><span class="detail-label">Cuenta 3:</span> <span class="detail-value">${registro.N_Cuenta_3}</span></div>` : ''}
+                    <div class="detail-item"><span class="detail-label">Nombre 1:</span> <span class="detail-value">${registro.Nombre_1}</span></div>
+                    ${registro.Nombre_2 ? `<div class="detail-item"><span class="detail-label">Nombre 2:</span> <span class="detail-value">${registro.Nombre_2}</span></div>` : ''}
+                    ${registro.Nombre_3 ? `<div class="detail-item"><span class="detail-label">Nombre 3:</span> <span class="detail-value">${registro.Nombre_3}</span></div>` : ''}
+                    <div class="detail-item"><span class="detail-label">Opción de titulación:</span> <span class="detail-value">${registro.Opcion_de_Titulacion}</span></div>
+                    <div class="detail-item"><span class="detail-label">Fecha:</span> <span class="detail-value">${registro.Fecha_del_Trabajo}</span></div>
+                    <div class="detail-item"><span class="detail-label">Color:</span> 
+                        <span class="detail-value">
+                            <span class="card-color" style="background: ${getColorCode(registro.Color)};"></span>
+                            ${registro.Color}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+// Función auxiliar para colores
+function getColorCode(color) {
     const colorMap = {
         "Azul": "#3498db",
         "Rojo": "#e74c3c",
@@ -87,35 +133,7 @@ function renderThesisCards(registros) {
         "Negro": "#2c3e50",
         "Default": "#95a5a6"
     };
-
-    registros.forEach(registro => {
-        const card = document.createElement('div');
-        card.className = 'bibliographic-card';
-        
-        card.innerHTML = `
-            <div class="card-image">
-                ${registro.imagen 
-                    ? `<img src="${registro.imagen}" alt="Portada de tesis">`
-                    : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
-                }
-            </div>
-            <div class="card-content">
-                <span class="card-id">${registro.N_Impreso_Digital}</span>
-                <h3 class="card-title">${registro.Titulo}</h3>
-                <p class="card-author"><i class="fas fa-user"></i> ${registro.Nombre_1}</p>
-                <div class="card-meta">
-                    <span><i class="fas fa-graduation-cap"></i> ${registro.Carrera}</span>
-                    <span>
-                        <i class="fas fa-palette"></i>
-                        <span class="card-color" style="background: ${colorMap[registro.Color] || colorMap.Default};"></span>
-                        ${registro.Color}
-                    </span>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(card);
-    });
+    return colorMap[color] || colorMap.Default;
 }
 
 // Función para verificar el token
