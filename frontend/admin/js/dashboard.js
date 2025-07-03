@@ -85,7 +85,7 @@ function renderThesisCards(registros) {
         
         card.innerHTML = `
             <div class="flip-card-inner">
-                <!-- Frente (imagen) -->
+                <!-- Frente (SOLO IMAGEN) -->
                 <div class="flip-card-front">
                     <div class="card-image">
                         ${registro.imagen 
@@ -93,12 +93,11 @@ function renderThesisCards(registros) {
                             : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
                         }
                     </div>
-                    <h3 class="card-title">${registro.Titulo}</h3>
-                    <p class="card-author"><i class="fas fa-user"></i> ${registro.Nombre_1}</p>
                 </div>
                 
-                <!-- Reverso (detalles) -->
+                <!-- Reverso (TODOS LOS DETALLES) -->
                 <div class="flip-card-back">
+                    <h3 class="card-title">${registro.Titulo}</h3>
                     <div class="detail-item"><span class="detail-label">ID:</span> <span class="detail-value">${registro.N_de_Registro}</span></div>
                     <div class="detail-item"><span class="detail-label">N° Impreso/Digital:</span> <span class="detail-value">${registro.N_Impreso_Digital}</span></div>
                     <div class="detail-item"><span class="detail-label">Carrera:</span> <span class="detail-value">${registro.Carrera}</span></div>

@@ -289,7 +289,9 @@ body {
 
 .flip-card-front {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important; /* Elimina el padding para que la imagen llene el espacio */
 }
 
 .flip-card-back {
@@ -300,7 +302,7 @@ body {
 /* Estilos para la imagen (frente) */
 .card-image {
     height: 60%;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: none;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
