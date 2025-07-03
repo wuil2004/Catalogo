@@ -339,6 +339,21 @@ body {
     margin-bottom: 8px;
 }
 
+/* Estilo para el título en el frente (cuando no hay imagen) */
+.card-title-front {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    word-break: break-word; /* Evita desbordamiento de texto */
+}
+
 /* Estilos para los detalles (reverso) */
 .detail-item {
     margin-bottom: 8px;

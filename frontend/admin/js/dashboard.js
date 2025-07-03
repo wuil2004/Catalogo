@@ -83,16 +83,16 @@ function renderThesisCards(registros) {
         const card = document.createElement('div');
         card.className = 'bibliographic-card';
         
+        // Contenido del frente (imagen o título)
+        const frontContent = registro.imagen 
+            ? `<div class="card-image"><img src="${registro.imagen}" alt="Portada de tesis"></div>`
+            : `<div class="card-title-front">${registro.Titulo}</div>`; // Nuevo estilo para título
+        
         card.innerHTML = `
             <div class="flip-card-inner">
-                <!-- Frente (SOLO IMAGEN) -->
+                <!-- Frente (imagen O título) -->
                 <div class="flip-card-front">
-                    <div class="card-image">
-                        ${registro.imagen 
-                            ? `<img src="${registro.imagen}" alt="Portada de tesis">`
-                            : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
-                        }
-                    </div>
+                    ${frontContent}
                 </div>
                 
                 <!-- Reverso (TODOS LOS DETALLES) -->
