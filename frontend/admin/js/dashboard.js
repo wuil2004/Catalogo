@@ -46,70 +46,96 @@ function setupResponsive() {
     }
 }
 
-// Función para cargar estadísticas del dashboard
-async function loadDashboardStats() {
+// Función para cargar los registros de tesis
+async function loadThesisCards() {
     try {
         const token = localStorage.getItem('adminToken');
-        const response = await fetch('http://localhost:3000/api/stats', {
+        const response = await fetch('http://localhost:3000/api/registros/admin', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) throw new Error('Error al cargar estadísticas');
+        if (!response.ok) throw new Error('Error al cargar registros');
         
-        const stats = await response.json();
-        renderStats(stats);
+        const registros = await response.json();
+        renderThesisCards(registros);
         
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('dashboardStats').innerHTML = `
+        document.getElementById('thesisCards').innerHTML = `
             <div class="error-message">
-                Error al cargar estadísticas: ${error.message}
+                Error al cargar registros: ${error.message}
             </div>
         `;
     }
 }
 
-// Función para mostrar las estadísticas
-function renderStats(stats) {
-    const statsContainer = document.getElementById('dashboardStats');
-    
-    statsContainer.innerHTML = `
-        <div class="stat-card">
-            <h3>Tesis registradas</h3>
-            <div class="value">${stats.thesisCount || 0}</div>
-            <div class="change ${stats.thesisChange >= 0 ? 'positive' : 'negative'}">
-                <i class="fas fa-${stats.thesisChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                ${Math.abs(stats.thesisChange)}% este mes
-            </div>
-        </div>
+// Función para renderizar las tarjetas
+function renderThesisCards(registros) {
+    const container = document.getElementById('thesisCards');
+    container.innerHTML = '';
+
+    if (registros.length === 0) {
+        container.innerHTML = '<p class="no-results">No hay registros de tesis disponibles</p>';
+        return;
+    }
+
+    // Mapeo de colores
+    const colorMap = {
+        "Azul": "#3498db",
+        "Rojo": "#e74c3c",
+        "Verde": "#2ecc71",
+        "Negro": "#2c3e50",
+        "Default": "#95a5a6"
+    };
+
+    registros.forEach(registro => {
+        const card = document.createElement('div');
+        card.className = 'bibliographic-card';
         
-        <div class="stat-card">
-            <h3>Administradores</h3>
-            <div class="value">${stats.adminCount || 0}</div>
-            <div class="change ${stats.adminChange >= 0 ? 'positive' : 'negative'}">
-                <i class="fas fa-${stats.adminChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                ${Math.abs(stats.adminChange)}% este mes
+        card.innerHTML = `
+            <div class="card-image">
+                ${registro.imagen 
+                    ? `<img src="/uploads/${registro.imagen}" alt="Portada de tesis">`
+                    : `<div class="placeholder"><i class="fas fa-book-open"></i></div>`
+                }
             </div>
-        </div>
+            <div class="card-content">
+                <span class="card-id">${registro.N_Impreso_Digital}</span>
+                <h3 class="card-title">${registro.Titulo}</h3>
+                <p class="card-author"><i class="fas fa-user"></i> ${registro.Nombre_1}</p>
+                <div class="card-meta">
+                    <span><i class="fas fa-graduation-cap"></i> ${registro.Carrera}</span>
+                    <span>
+                        <i class="fas fa-palette"></i>
+                        <span class="card-color" style="background: ${colorMap[registro.Color] || colorMap.Default};"></span>
+                        ${registro.Color}
+                    </span>
+                </div>
+            </div>
+        `;
         
-        <div class="stat-card">
-            <h3>Usuarios activos</h3>
-            <div class="value">${stats.activeUsers || 0}</div>
-            <div class="change ${stats.usersChange >= 0 ? 'positive' : 'negative'}">
-                <i class="fas fa-${stats.usersChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                ${Math.abs(stats.usersChange)}% este mes
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <h3>Última actividad</h3>
-            <div class="value">${stats.lastActivity || 'N/A'}</div>
-            <div class="change">
-                <i class="fas fa-clock"></i>
-                Actualizado ahora
-            </div>
-        </div>
-    `;
+        container.appendChild(card);
+    });
+}
+
+// Función para verificar el token
+async function verifyToken(token) {
+    try {
+        const response = await fetch('http://localhost:3000/api/admins/verify-token', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Error verificando token:', error);
+        return false;
+    }
+}
+
+// Función para cerrar sesión
+function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    window.location.href = '/admin/index.html';
 }
 
 // Inicialización
@@ -137,34 +163,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Cargar estadísticas del dashboard
-        await loadDashboardStats();
+        // Cargar tarjetas de tesis
+        await loadThesisCards();
 
     } catch (error) {
         console.error('Error de autenticación:', error);
         logout();
     }
 });
-
-// Función para verificar el token
-async function verifyToken(token) {
-    try {
-        const response = await fetch('http://localhost:3000/api/admins/verify-token', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        return response.ok;
-    } catch (error) {
-        console.error('Error verificando token:', error);
-        return false;
-    }
-}
-
-// Función para cerrar sesión
-function logout() {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminData');
-    window.location.href = '/admin/index.html';
-}
 
 // Configurar redimensionamiento
 window.addEventListener('resize', setupResponsive);
