@@ -126,10 +126,14 @@ function renderThesisCards(registros) {
 // Función auxiliar para colores
 function getColorCode(color) {
     const colorMap = {
-        "Azul": "#3498db",
-        "Rojo": "#e74c3c",
-        "Verde": "#2ecc71",
-        "Negro": "#2c3e50",
+        "NEGRO":" #000000",
+        "AZUL":" #002147",
+        "VERDE":" #014421",
+        "GRIS OXFORD":" #2F4F4F",
+        "CAFE":" #4B3621",
+        "VINO":" #4B0014",
+        "ROJO":"	#8B0000",
+        "GRIS":" #3A3A3A",
         "Default": "#95a5a6"
     };
     return colorMap[color] || colorMap.Default;
