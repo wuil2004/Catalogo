@@ -257,6 +257,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px 0;
+    overflow: visible;
 }
 
 .carousel {
@@ -267,9 +268,10 @@ body {
     -webkit-overflow-scrolling: touch;
     width: calc(100% - 100px);
     gap: 20px;
-    padding: 20px 0;
-    margin: 0 auto;
-    user-select: none;
+    padding: 40px 0;
+    margin: -40px 0;
+    align-items: center;
+    perspective: 1500px;
 }
 
 .carousel::-webkit-scrollbar {
@@ -306,19 +308,42 @@ body {
     font-size: 1.2rem;
 }
 
+/* Tarjetas del carrusel */
 .bibliographic-card {
-    flex: 0 0 calc(33.333% - 20px);
-    min-width: 300px;
+    flex: 0 0 300px;
     scroll-snap-align: start;
-    margin: 0 10px;
     background: white;
     border-radius: 8px;
     box-shadow: var(--shadow);
-    transition: var(--transition);
     height: 400px;
     perspective: 1000px;
     cursor: pointer;
     flex-shrink: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    position: relative;
+    margin: 0 10px;
+    transform-style: preserve-3d;
+}
+
+/* Añade estas nuevas clases */
+.bibliographic-card.center-card {
+    transform: scale(1.05) translateY(-10px);
+    z-index: 2;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.bibliographic-card.side-card {
+    transform: scale(0.95);
+    opacity: 0.9;
+    z-index: 1;
+    filter: brightness(0.95);
+}
+
+/* Efecto hover */
+.bibliographic-card:hover {
+    transform: scale(1.08) translateY(-5px) !important;
+    z-index: 3 !important;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2) !important;
 }
 
 .flip-card-inner {
@@ -463,18 +488,34 @@ body {
 
 @media (max-width: 992px) {
     .bibliographic-card {
-        flex: 0 0 calc(50% - 20px);
+        flex: 0 0 250px;
+    }
+    
+    .bibliographic-card:nth-child(2) {
+        transform: scale(1.05) translateY(-10px);
     }
 }
 
 @media (max-width: 768px) {
     .carousel {
         width: calc(100% - 60px);
+        padding: 20px 0;
     }
     
     .bibliographic-card {
-        flex: 0 0 calc(100% - 20px);
+        flex: 0 0 80%;
         height: 350px;
+        margin: 0 5px;
+    }
+    
+    .bibliographic-card:nth-child(2),
+    .bibliographic-card:hover {
+        transform: scale(1.02) translateY(-5px) !important;
+    }
+    
+    .bibliographic-card:first-child,
+    .bibliographic-card:last-child {
+        transform: scale(0.95) translateY(5px);
+        opacity: 0.95;
     }
 }
-
