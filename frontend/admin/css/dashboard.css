@@ -19,7 +19,6 @@
     --transition: all 0.3s ease;
 }
 
-/* Estilos generales */
 * {
     margin: 0;
     padding: 0;
@@ -32,7 +31,7 @@ body {
     color: var(--text-color);
 }
 
-/* Panel lateral (sin cambios) */
+/* Sidebar */
 .sidebar {
     width: 280px;
     background: var(--sidebar-color);
@@ -43,6 +42,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 1000;
 }
 
 .sidebar.collapsed {
@@ -197,8 +197,6 @@ body {
     }
     
     .sidebar {
-        position: fixed;
-        z-index: 999;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
@@ -249,14 +247,70 @@ body {
     padding: 1.5rem;
 }
 
-/* ==================== FLIP CARDS ==================== */
-.bibliographic-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+/* Carrusel */
+.carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    width: calc(100% - 100px);
     gap: 20px;
+    padding: 20px 0;
+    margin: 0 auto;
+    user-select: none;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.carousel-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 10;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+.carousel-btn:hover {
+    background: var(--primary-dark);
+}
+
+.carousel-btn i {
+    font-size: 1.2rem;
 }
 
 .bibliographic-card {
+    flex: 0 0 calc(33.333% - 20px);
+    min-width: 300px;
+    scroll-snap-align: start;
+    margin: 0 10px;
     background: white;
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -264,6 +318,7 @@ body {
     height: 400px;
     perspective: 1000px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .flip-card-inner {
@@ -291,7 +346,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-     /*padding: 0 !important; /* Elimina el padding para que la imagen llene el espacio */
 }
 
 .flip-card-back {
@@ -299,23 +353,22 @@ body {
     transform: rotateY(180deg);
 }
 
-/* Estilos para la imagen (frente) */
 .card-image {
-    width: 100%; /* Ocupa todo el ancho */
-    height: 100%; /* Ocupa toda la altura */
+    width: 100%;
+    height: 100%;
     border-bottom: none;
-    margin-bottom: 0; /* Elimina el margen inferior */
+    margin-bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden; /* Evita que la imagen se desborde */
+    overflow: hidden;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Cubre todo el espacio manteniendo proporciones */
-    object-position: center; /* Centra la imagen */
+    object-fit: contain;
+    object-position: center;
 }
 
 .card-image .placeholder {
@@ -336,13 +389,6 @@ body {
     overflow: hidden;
 }
 
-.card-author {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    margin-bottom: 8px;
-}
-
-/* Estilo para el título en el frente (cuando no hay imagen) */
 .card-title-front {
     width: 100%;
     height: 100%;
@@ -354,10 +400,9 @@ body {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--dark-color);
-    word-break: break-word; /* Evita desbordamiento de texto */
+    word-break: break-word;
 }
 
-/* Estilos para los detalles (reverso) */
 .detail-item {
     margin-bottom: 8px;
     font-size: 0.85rem;
@@ -381,7 +426,27 @@ body {
     vertical-align: middle;
 }
 
-/* Mensajes de error/empty */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dot.active {
+    background: var(--primary-color);
+    transform: scale(1.2);
+}
+
 .error-message {
     color: var(--danger-color);
     padding: 20px;
@@ -396,13 +461,20 @@ body {
     padding: 20px;
 }
 
-/* Responsive */
+@media (max-width: 992px) {
+    .bibliographic-card {
+        flex: 0 0 calc(50% - 20px);
+    }
+}
+
 @media (max-width: 768px) {
-    .bibliographic-cards {
-        grid-template-columns: 1fr;
+    .carousel {
+        width: calc(100% - 60px);
     }
     
     .bibliographic-card {
+        flex: 0 0 calc(100% - 20px);
         height: 350px;
     }
 }
+

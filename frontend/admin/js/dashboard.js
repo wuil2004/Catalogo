@@ -12,19 +12,12 @@ function toggleSidebar() {
 
 // Configurar event listeners para el sidebar
 function setupSidebar() {
-    // Toggle sidebar con avatar
     document.getElementById('userAvatar')?.addEventListener('click', toggleSidebar);
-    
-    // Toggle sidebar con botón
     document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
-    
-    // Cerrar sesión
     document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
         logout();
     });
-    
-    // Configurar responsividad
     setupResponsive();
 }
 
@@ -61,7 +54,7 @@ async function loadThesisCards() {
         
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('thesisCards').innerHTML = `
+        document.getElementById('thesisCarousel').innerHTML = `
             <div class="error-message">
                 Error al cargar registros: ${error.message}
             </div>
@@ -69,40 +62,33 @@ async function loadThesisCards() {
     }
 }
 
-// Función para renderizar las tarjetas giratorias
+// Función para renderizar las tarjetas en el carrusel
 function renderThesisCards(registros) {
-    const container = document.getElementById('thesisCards');
-    container.innerHTML = '';
+    const carousel = document.getElementById('thesisCarousel');
+    const dotsContainer = document.getElementById('carouselDots');
+    carousel.innerHTML = '';
+    dotsContainer.innerHTML = '';
 
     if (registros.length === 0) {
-        container.innerHTML = '<p class="no-results">No hay registros de tesis disponibles</p>';
+        carousel.innerHTML = '<p class="no-results">No hay registros de tesis disponibles</p>';
         return;
     }
 
-    registros.forEach(registro => {
+    registros.forEach((registro, index) => {
         const card = document.createElement('div');
         card.className = 'bibliographic-card';
-        
-        // Obtener el código de color para el borde
         const colorCode = getColorCode(registro.Color);
-        
-        // Aplicar el estilo del borde directamente
         card.style.border = `4px solid ${colorCode}`;
-        card.style.borderRadius = '8px'; // Para mantener el borderRadius
-        
-        // Contenido del frente (imagen o título)
+
         const frontContent = registro.imagen 
             ? `<div class="card-image"><img src="${registro.imagen}" alt="Portada de tesis"></div>`
             : `<div class="card-title-front">${registro.Titulo}</div>`;
-        
+
         card.innerHTML = `
             <div class="flip-card-inner">
-                <!-- Frente (imagen O título) -->
                 <div class="flip-card-front">
                     ${frontContent}
                 </div>
-                
-                <!-- Reverso (TODOS LOS DETALLES) -->
                 <div class="flip-card-back">
                     <h3 class="card-title">${registro.Titulo}</h3>
                     <div class="detail-item"><span class="detail-label">ID:</span> <span class="detail-value">${registro.N_de_Registro}</span></div>
@@ -126,21 +112,113 @@ function renderThesisCards(registros) {
             </div>
         `;
         
-        container.appendChild(card);
+        carousel.appendChild(card);
+
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.dataset.index = index;
+        dot.addEventListener('click', () => scrollToCard(index));
+        dotsContainer.appendChild(dot);
+    });
+
+    if (dotsContainer.firstChild) {
+        dotsContainer.firstChild.classList.add('active');
+    }
+
+    setupCarouselControls(registros.length);
+}
+
+// Configurar controles del carrusel
+function setupCarouselControls(totalCards) {
+    const carousel = document.getElementById('thesisCarousel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dots = document.querySelectorAll('.dot');
+    
+    if (!carousel.firstChild) return;
+
+    const card = document.querySelector('.bibliographic-card');
+    const cardWidth = card.offsetWidth + 20;
+    let currentIndex = 0;
+
+    function updateCarousel() {
+        carousel.scrollTo({
+            left: currentIndex * cardWidth,
+            behavior: 'smooth'
+        });
+        
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex);
+        });
+    }
+
+    prevBtn?.addEventListener('click', () => {
+        currentIndex = Math.max(0, currentIndex - 1);
+        updateCarousel();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+        currentIndex = Math.min(totalCards - 1, currentIndex + 1);
+        updateCarousel();
+    });
+
+    // Configurar eventos táctiles
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    carousel.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+    });
+
+    carousel.addEventListener('mouseleave', () => {
+        isDown = false;
+    });
+
+    carousel.addEventListener('mouseup', () => {
+        isDown = false;
+        currentIndex = Math.round(carousel.scrollLeft / cardWidth);
+        updateCarousel();
+    });
+
+    carousel.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 2;
+        carousel.scrollLeft = scrollLeft - walk;
+    });
+}
+
+function scrollToCard(index) {
+    const carousel = document.getElementById('thesisCarousel');
+    const card = document.querySelector('.bibliographic-card');
+    if (!card) return;
+    
+    const cardWidth = card.offsetWidth + 20;
+    carousel.scrollTo({
+        left: index * cardWidth,
+        behavior: 'smooth'
+    });
+
+    document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
     });
 }
 
 // Función auxiliar para colores
 function getColorCode(color) {
     const colorMap = {
-        "NEGRO":" #000000",
-        "AZUL":" #002147",
-        "VERDE":" #014421",
-        "GRIS OXFORD":" #2F4F4F",
-        "CAFE":" #4B3621",
-        "VINO":" #4B0014",
-        "ROJO":"	#8B0000",
-        "GRIS":" #3A3A3A",
+        "NEGRO": "#000000",
+        "AZUL": "#002147",
+        "VERDE": "#014421",
+        "GRIS OXFORD": "#2F4F4F",
+        "CAFE": "#4B3621",
+        "VINO": "#4B0014",
+        "ROJO": "#8B0000",
+        "GRIS": "#3A3A3A",
         "Default": "rgb(8, 114, 122)"
     };
     return colorMap[color] || colorMap.Default;
@@ -150,9 +228,20 @@ function getColorCode(color) {
 async function verifyToken(token) {
     try {
         const response = await fetch('http://localhost:3000/api/admins/verify-token', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
-        return response.ok;
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.valid === true;
+        
     } catch (error) {
         console.error('Error verificando token:', error);
         return false;
@@ -169,17 +258,14 @@ function logout() {
 // Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Verificar autenticación
         const token = localStorage.getItem('adminToken');
         if (!token) throw new Error('No autenticado');
 
         const tokenValid = await verifyToken(token);
         if (!tokenValid) throw new Error('Token inválido');
 
-        // Configurar sidebar
         setupSidebar();
-        
-        // Mostrar usuario actual
+
         const adminData = JSON.parse(localStorage.getItem('adminData'));
         if (adminData) {
             const userNameElement = document.querySelector('.user-name');
@@ -191,7 +277,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Cargar tarjetas de tesis
         await loadThesisCards();
 
     } catch (error) {
@@ -200,5 +285,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Configurar redimensionamiento
 window.addEventListener('resize', setupResponsive);
