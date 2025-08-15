@@ -5,7 +5,7 @@ const path = require('path');
 const conexion = require('./conexion');
 const { authenticateToken } = require('./middleware/authMiddleware');
 const adminController = require('./controllers/adminController');
-const registrosController = require ('./controllers/registrosController');
+const registrosController = require ('./controllers/registrosController')
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,16 +14,14 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- SECCIÓN CORREGIDA ---
-// Configuración de archivos estáticos. El '..' sube un nivel desde la carpeta 'backend'.
-app.use(express.static(path.join(__dirname, '..', 'frontend/public')));
-app.use('/admin', express.static(path.join(__dirname, '..', 'frontend/admin')));
+// Configuración de archivos estáticos
+app.use(express.static(path.join(__dirname, 'frontend/public')));
+app.use('/admin', express.static(path.join(__dirname, 'frontend/admin')));
 
-// Redirección para la ruta /admin para que sirva el index.html de la carpeta admin.
+// Redirecciones bien definidas
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'frontend/admin/index.html'));
+    res.sendFile(path.join(__dirname, 'frontend/admin/index.html'));
 });
-// --- FIN DE LA SECCIÓN CORREGIDA ---
 
 // Agrega esta nueva ruta para verificar tokens
 app.get('/api/admins/verify-token', authenticateToken, (req, res) => {
@@ -61,6 +59,7 @@ app.get('/api/admins/dashboard', authenticateToken, (req, res) => {
     });
 });
 
+
 // API para registros (protegida)
 app.get('/api/registros/admin', authenticateToken, registrosController.getAllRegistros);
 app.get('/api/registros/admin/:id', authenticateToken, registrosController.getRegistroById);
@@ -68,12 +67,8 @@ app.post('/api/registros/admin', authenticateToken, registrosController.createRe
 app.put('/api/registros/admin/:id', authenticateToken, registrosController.updateRegistro);
 app.delete('/api/registros/admin/:id', authenticateToken, registrosController.deleteRegistro);
 
-// Manejo de errores para rutas no encontradas (debe ir al final)
-app.use((req, res, next) => {
-    // Si la petición no fue manejada por una ruta de API ni por un archivo estático,
-    // podríamos enviar el index.html principal para que el enrutador del frontend se encargue.
-    // Opcional, dependiendo de si usas un framework como React/Angular/Vue.
-    // Si no, el error 404 es adecuado.
+// Manejo de errores
+app.use((req, res) => {
     res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
