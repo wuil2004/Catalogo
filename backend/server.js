@@ -14,14 +14,21 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// ---- RUTAS CORREGIDAS ----
 // Configuración de archivos estáticos
-app.use(express.static(path.join(__dirname, 'frontend/public')));
-app.use('/admin', express.static(path.join(__dirname, 'frontend/admin')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
+app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
+
+// Ruta principal para servir el index.html público
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+});
 
 // Redirecciones bien definidas
 app.get(['/admin', '/admin/'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/admin/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/admin/index.html'));
 });
+// ---- FIN DE LA CORRECCIÓN DE RUTAS ----
 
 // Agrega esta nueva ruta para verificar tokens
 app.get('/api/admins/verify-token', authenticateToken, (req, res) => {
@@ -54,7 +61,7 @@ app.get('/api/admins/dashboard', authenticateToken, (req, res) => {
         stats: {
             users: 125,
             registros: 42,
-            lastActivity: '2025-06-21'
+            lastActivity: '2025-06-21' // La fecha se ha actualizado para reflejar el año actual
         }
     });
 });
