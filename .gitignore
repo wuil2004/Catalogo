@@ -1,0 +1,10 @@
+# Node
+backend/node_modules/
+backend/uploads/
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+.env
