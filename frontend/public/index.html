@@ -10,10 +10,8 @@
     :root {
       --color-fondo: #f8f9fa;
       --color-verde-principal: #005A3A;
-      /* Verde oscuro del logo */
       --color-verde-hover: #00452c;
       --color-amarillo-acento: #fecb00;
-      /* Amarillo del logo */
       --color-texto-principal: #212529;
       --color-texto-secundario: #6c757d;
       --color-bordes: #dee2e6;
@@ -113,44 +111,35 @@
       overflow: hidden;
       border: 1px solid var(--color-bordes);
       border-left-width: 5px;
-      /* Grosor del borde de color */
     }
 
     /* ESTILOS TEMÁTICOS CONSERVADOS */
     .card[data-carrera*="ING."] {
       border-left-color: #3498db;
     }
-
     .card[data-carrera*="LIC. INFORMATICA"],
     .card[data-carrera*="ING. INFORMATICA"] {
       border-left-color: #1b81c1;
     }
-
     .card[data-carrera*="ING. SISTEMAS COMPUTACIONALES"] {
       border-left-color: #098b05;
     }
-
     .card[data-carrera*="ING. TICS"] {
       border-left-color: #1d5f96;
     }
-
     .card[data-carrera*="LIC. ADMINISTRACIÓN"] {
       border-left-color: #f31212;
     }
-
     .card[data-carrera*="ING. INDUSTRIAL"],
     .card[data-carrera*="ING. LOGISTICA"] {
       border-left-color: #1054bb;
     }
-
     .card[data-carrera*="ING. QUIMICA"] {
       border-left-color: #f60303;
     }
-
     .card[data-carrera*="ING. CIVIL"] {
       border-left-color: #cc8109ba;
     }
-
     .card[data-carrera*="ING. MECATRONICA"] {
       border-left-color: #7c7c7c;
     }
@@ -356,9 +345,9 @@
       border-radius: 8px;
       border: 1px solid var(--color-bordes);
       background-color: var(--color-fondo);
+      /* --- AÑADIDO: Cursor para indicar que se puede hacer clic --- */
+      cursor: zoom-in; 
     }
-
-
 
     /* --- LOADER CON NUEVO COLOR --- */
     .loader-container {
@@ -378,13 +367,8 @@
     }
 
     @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     /* --- ESTILOS DE PAGINACIÓN --- */
@@ -444,35 +428,69 @@
       grid-column: 1 / -1;
     }
 
+    /* --- AÑADIDO: ESTILOS PARA EL LIGHTBOX (IMAGEN EN PANTALLA COMPLETA) --- */
+    .lightbox {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      z-index: 2000; /* Debe estar por encima de todo, incluido el modal */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      transition: transform 0.4s ease;
+      transform: scale(0.8);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .lightbox-close:hover {
+      color: #bbb;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .modal-body {
         grid-template-columns: 1fr;
       }
-
       .modal-content {
         width: 90%;
         margin: 20px auto;
       }
-
       .modal-image-placeholder {
         height: 200px;
         margin-top: 20px;
       }
-
       h1 {
         font-size: 1.5rem;
       }
-
       .header-logo {
         max-height: 60px;
       }
-
       .pagination {
         flex-wrap: wrap;
         justify-content: center;
       }
-
       .cards-container {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       }
@@ -500,20 +518,16 @@
         <option value="Opcion_de_Titulacion">Opción de Titulación</option>
       </select>
     </div>
-
     <div class="filter-group">
       <label for="filtroTexto">Texto a buscar:</label>
-      <input type="text" id="filtroTexto" class="filter-input" placeholder="Escribe aquí..."
-        oninput="filtrarRegistros()">
+      <input type="text" id="filtroTexto" class="filter-input" placeholder="Escribe aquí..." oninput="filtrarRegistros()">
     </div>
-
     <div class="filter-group">
       <label for="filtroCarrera">Filtrar por carrera:</label>
       <select id="filtroCarrera" class="filter-select" onchange="filtrarRegistros()">
         <option value="">Todas las carreras</option>
       </select>
     </div>
-
     <div class="filter-group">
       <label for="registrosPorPagina">Registros por página:</label>
       <select id="registrosPorPagina" class="filter-select" onchange="cambiarRegistrosPorPagina()">
@@ -532,13 +546,8 @@
     </div>
   </div>
 
-  <div id="paginationContainer" class="pagination-container">
-    <!-- La paginación se generará dinámicamente -->
-  </div>
-
-  <div id="registrosInfo" class="registros-info">
-    <!-- La información de registros se generará dinámicamente -->
-  </div>
+  <div id="paginationContainer" class="pagination-container"></div>
+  <div id="registrosInfo" class="registros-info"></div>
 
   <div id="modalDetalles" class="modal">
     <div class="modal-content">
@@ -546,8 +555,7 @@
         <h2 class="modal-title">Trabajo de Titulacion</h2>
         <button class="modal-close" onclick="cerrarModal()">&times;</button>
       </div>
-      <div class="modal-body" id="modalBody">
-      </div>
+      <div class="modal-body" id="modalBody"></div>
       <div class="modal-footer">
         <div class="modal-project-info">
           <span class="modal-project-label">Nombre del proyecto:</span>
@@ -560,6 +568,11 @@
     </div>
   </div>
 
+  <div id="lightbox" class="lightbox">
+    <span class="lightbox-close" onclick="cerrarLightbox()">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+  </div>
+
   <script>
     let todosRegistros = [];
     let registrosFiltrados = [];
@@ -570,26 +583,20 @@
     async function obtenerRegistros() {
       try {
         document.getElementById('cardsContainer').innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
-
-        // Simulación de fetch. Reemplaza la URL con la tuya.
         const respuesta = await fetch('http://localhost:3000/api/registros');
         if (!respuesta.ok) {
           throw new Error(`Error HTTP: ${respuesta.status}`);
         }
         todosRegistros = await respuesta.json();
-
         carrerasUnicas = new Set(todosRegistros.map(r => r.Carrera).filter(Boolean));
         const selectCarreras = document.getElementById('filtroCarrera');
-
         const carrerasOrdenadas = Array.from(carrerasUnicas).sort();
-
         carrerasOrdenadas.forEach(carrera => {
           const option = document.createElement('option');
           option.value = carrera;
           option.textContent = carrera;
           selectCarreras.appendChild(option);
         });
-
         registrosFiltrados = [...todosRegistros];
         mostrarRegistrosPaginados();
       } catch (error) {
@@ -603,23 +610,18 @@
       const container = document.getElementById('cardsContainer');
       const paginationContainer = document.getElementById('paginationContainer');
       const registrosInfo = document.getElementById('registrosInfo');
-
-      // Calcular registros para la página actual
       const inicio = (paginaActual - 1) * registrosPorPagina;
       const fin = registrosPorPagina === 0 ? registrosFiltrados.length : inicio + registrosPorPagina;
       const registrosPagina = registrosFiltrados.slice(inicio, fin);
 
-      // Mostrar registros
       if (registrosPagina.length === 0) {
         container.innerHTML = '<div class="no-registros">No se encontraron registros que coincidan con los filtros.</div>';
       } else {
         container.innerHTML = '';
-
         registrosPagina.forEach(r => {
           const card = document.createElement('div');
           card.className = 'card';
           card.setAttribute('data-carrera', r.Carrera || '');
-
           card.innerHTML = `
             <div class="card-header">
               <h3 class="card-title">${r.Titulo || 'Sin título'}</h3>
@@ -636,83 +638,43 @@
               </div>
             </div>
           `;
-
           card.addEventListener('click', () => mostrarDetallesRegistro(r));
           container.appendChild(card);
         });
       }
 
-      // Mostrar información de registros
       const totalRegistros = registrosFiltrados.length;
-      const textoInfo = registrosPorPagina === 0
-        ? `Mostrando todos los ${totalRegistros} registros`
-        : `Mostrando registros ${inicio + 1} a ${Math.min(fin, totalRegistros)} de ${totalRegistros}`;
-
+      const textoInfo = registrosPorPagina === 0 ?
+        `Mostrando todos los ${totalRegistros} registros` :
+        `Mostrando registros ${inicio + 1} a ${Math.min(fin, totalRegistros)} de ${totalRegistros}`;
       registrosInfo.textContent = textoInfo;
 
-      // Generar paginación solo si hay más de una página
       if (registrosPorPagina > 0 && totalRegistros > registrosPorPagina) {
         const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
-
         let paginacionHTML = '<ul class="pagination">';
-
-        // Botón Anterior
-        paginacionHTML += `
-          <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
-            <a class="page-link" onclick="cambiarPagina(${paginaActual - 1})">Anterior</a>
-          </li>
-        `;
-
-        // Páginas
+        paginacionHTML += `<li class="page-item ${paginaActual === 1 ? 'disabled' : ''}"><a class="page-link" onclick="cambiarPagina(${paginaActual - 1})">Anterior</a></li>`;
         const maxPaginasVisibles = 5;
         let inicioPaginas = Math.max(1, paginaActual - Math.floor(maxPaginasVisibles / 2));
         let finPaginas = Math.min(totalPaginas, inicioPaginas + maxPaginasVisibles - 1);
-
-        // Ajustar si estamos cerca del final
         if (finPaginas - inicioPaginas + 1 < maxPaginasVisibles) {
           inicioPaginas = Math.max(1, finPaginas - maxPaginasVisibles + 1);
         }
-
-        // Primera página y elipsis si es necesario
         if (inicioPaginas > 1) {
-          paginacionHTML += `
-            <li class="page-item">
-              <a class="page-link" onclick="cambiarPagina(1)">1</a>
-            </li>
-          `;
+          paginacionHTML += `<li class="page-item"><a class="page-link" onclick="cambiarPagina(1)">1</a></li>`;
           if (inicioPaginas > 2) {
             paginacionHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
           }
         }
-
-        // Páginas visibles
         for (let i = inicioPaginas; i <= finPaginas; i++) {
-          paginacionHTML += `
-            <li class="page-item ${i === paginaActual ? 'active' : ''}">
-              <a class="page-link" onclick="cambiarPagina(${i})">${i}</a>
-            </li>
-          `;
+          paginacionHTML += `<li class="page-item ${i === paginaActual ? 'active' : ''}"><a class="page-link" onclick="cambiarPagina(${i})">${i}</a></li>`;
         }
-
-        // Última página y elipsis si es necesario
         if (finPaginas < totalPaginas) {
           if (finPaginas < totalPaginas - 1) {
             paginacionHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
           }
-          paginacionHTML += `
-            <li class="page-item">
-              <a class="page-link" onclick="cambiarPagina(${totalPaginas})">${totalPaginas}</a>
-            </li>
-          `;
+          paginacionHTML += `<li class="page-item"><a class="page-link" onclick="cambiarPagina(${totalPaginas})">${totalPaginas}</a></li>`;
         }
-
-        // Botón Siguiente
-        paginacionHTML += `
-          <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
-            <a class="page-link" onclick="cambiarPagina(${paginaActual + 1})">Siguiente</a>
-          </li>
-        `;
-
+        paginacionHTML += `<li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}"><a class="page-link" onclick="cambiarPagina(${paginaActual + 1})">Siguiente</a></li>`;
         paginacionHTML += '</ul>';
         paginationContainer.innerHTML = paginacionHTML;
       } else {
@@ -739,9 +701,9 @@
       const modal = document.getElementById('modalDetalles');
       const modalBody = document.getElementById('modalBody');
       const modalTituloTesis = document.getElementById('modalTituloTesis');
-
       modalTituloTesis.textContent = registro.Titulo || 'Sin título';
 
+      // --- MODIFICADO: Se añade el evento onclick a la imagen ---
       modalBody.innerHTML = `
         <div class="modal-column">
           <div class="modal-row">
@@ -765,10 +727,10 @@
         </div>
         <div class="modal-column">
           ${registro.imagen
-          ? `<img src="${registro.imagen}" alt="Imagen del trabajo" class="modal-image" onerror="this.src='/public/assets/img-placeholder.png'">`
-          : `<div class="modal-image-placeholder">Sin imagen disponible</div>`}
+            ? `<img src="${registro.imagen}" alt="Imagen del trabajo" class="modal-image" onclick="abrirLightbox('${registro.imagen}')" onerror="this.src='/public/assets/img-placeholder.png'">`
+            : `<div class="modal-image-placeholder">Sin imagen disponible</div>`
+          }
         </div>
-
       `;
 
       modal.style.display = 'block';
@@ -776,7 +738,6 @@
         modal.style.opacity = '1';
         document.querySelector('.modal-content').style.transform = 'translateY(0)';
       }, 10);
-
       document.body.style.overflow = 'hidden';
     }
 
@@ -784,11 +745,39 @@
       const modal = document.getElementById('modalDetalles');
       modal.style.opacity = '0';
       document.querySelector('.modal-content').style.transform = 'translateY(-20px)';
-
       setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
       }, 300);
+    }
+
+    // --- AÑADIDO: FUNCIONES PARA CONTROLAR EL LIGHTBOX ---
+    function abrirLightbox(src) {
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+
+      if (lightbox && lightboxImg) {
+        lightboxImg.src = src;
+        lightbox.style.display = 'flex';
+        setTimeout(() => {
+          lightbox.style.opacity = '1';
+          lightboxImg.style.transform = 'scale(1)';
+        }, 10);
+        // Opcional: No ocultar el scroll del body aquí, porque el modal ya lo hace.
+      }
+    }
+
+    function cerrarLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+
+      if (lightbox && lightboxImg) {
+        lightbox.style.opacity = '0';
+        lightboxImg.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+          lightbox.style.display = 'none';
+        }, 400); // Coincide con la transición CSS
+      }
     }
 
     function filtrarRegistros() {
@@ -799,9 +788,7 @@
       registrosFiltrados = todosRegistros.filter(r => {
         const porCarrera = !carreraFiltro || r.Carrera === carreraFiltro;
         if (!porCarrera) return false;
-
         if (!textoBusqueda) return true;
-
         let valorCampo = '';
         if (campoBusqueda.startsWith('Nombre_')) {
           valorCampo = r[campoBusqueda] || '';
@@ -821,6 +808,13 @@
       const modal = document.getElementById('modalDetalles');
       if (event.target === modal) {
         cerrarModal();
+      }
+    });
+
+    // --- AÑADIDO: EVENT LISTENER PARA CERRAR EL LIGHTBOX AL HACER CLIC FUERA DE LA IMAGEN ---
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('lightbox')) {
+        cerrarLightbox();
       }
     });
   </script>
