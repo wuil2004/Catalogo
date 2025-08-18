@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer'); // <--- 1. IMPORTAR MULTER
 const conexion = require('./conexion');
 const { authenticateToken } = require('./middleware/authMiddleware');
 const adminController = require('./controllers/adminController');
@@ -13,11 +14,26 @@ const port = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Necesario para procesar form-data
 
-// ---- RUTAS CORREGIDAS ----
-// Configuración de archivos estáticos
+// ---- 2. CONFIGURACIÓN DE MULTER ----
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'uploads/')); // Carpeta donde se guardan las imágenes
+  },
+  filename: function (req, file, cb) {
+    // Nombre de archivo único para evitar colisiones
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
+// ---- RUTAS DE ARCHIVOS ESTÁTICOS ----
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
+// 3. HACER PÚBLICA LA CARPETA 'UPLOADS'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ruta principal para servir el index.html público
 app.get('/', (req, res) => {
@@ -28,7 +44,6 @@ app.get('/', (req, res) => {
 app.get(['/admin', '/admin/'], (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/admin/index.html'));
 });
-// ---- FIN DE LA CORRECCIÓN DE RUTAS ----
 
 // Agrega esta nueva ruta para verificar tokens
 app.get('/api/admins/verify-token', authenticateToken, (req, res) => {
@@ -61,18 +76,19 @@ app.get('/api/admins/dashboard', authenticateToken, (req, res) => {
         stats: {
             users: 125,
             registros: 42,
-            lastActivity: '2025-06-21' // La fecha se ha actualizado para reflejar el año actual
+            lastActivity: '2025-08-17' 
         }
     });
 });
 
-
-// API para registros (protegida)
+// ---- API PARA REGISTROS (PROTEGIDA Y MODIFICADA) ----
 app.get('/api/registros/admin', authenticateToken, registrosController.getAllRegistros);
 app.get('/api/registros/admin/:id', authenticateToken, registrosController.getRegistroById);
-app.post('/api/registros/admin', authenticateToken, registrosController.createRegistro);
-app.put('/api/registros/admin/:id', authenticateToken, registrosController.updateRegistro);
 app.delete('/api/registros/admin/:id', authenticateToken, registrosController.deleteRegistro);
+
+// 4. AÑADIR EL MIDDLEWARE DE MULTER A LAS RUTAS POST Y PUT
+app.post('/api/registros/admin', authenticateToken, upload.single('imagen'), registrosController.createRegistro);
+app.put('/api/registros/admin/:id', authenticateToken, upload.single('imagen'), registrosController.updateRegistro);
 
 // Manejo de errores
 app.use((req, res) => {

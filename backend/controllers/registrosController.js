@@ -1,4 +1,3 @@
-// controllers/registrosController.js
 const conexion = require('../conexion');
 
 const getAllRegistros = (req, res) => {
@@ -28,6 +27,13 @@ const getRegistroById = (req, res) => {
 };
 
 const createRegistro = (req, res) => {
+    // Si multer procesó un archivo, su información estará en req.file
+    if (req.file) {
+        // Creamos la ruta de acceso web y la añadimos al cuerpo de la petición
+        req.body.imagen = `/uploads/${req.file.filename}`;
+    }
+
+    // El resto del código funciona igual, ya que req.body ahora tiene el campo 'imagen'
     const {
         N_Impreso_Digital,
         Carrera,
@@ -46,36 +52,12 @@ const createRegistro = (req, res) => {
 
     const query = `
         INSERT INTO Registros (
-            N_Impreso_Digital,
-            Carrera,
-            N_Cuenta_1,
-            N_Cuenta_2,
-            N_Cuenta_3,
-            Nombre_1,
-            Nombre_2,
-            Nombre_3,
-            Opcion_de_Titulacion,
-            Titulo,
-            Fecha_del_Trabajo,
-            Color,
-            imagen
+            N_Impreso_Digital, Carrera, N_Cuenta_1, N_Cuenta_2, N_Cuenta_3, Nombre_1, Nombre_2, Nombre_3, Opcion_de_Titulacion, Titulo, Fecha_del_Trabajo, Color, imagen
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-        N_Impreso_Digital,
-        Carrera,
-        N_Cuenta_1,
-        N_Cuenta_2,
-        N_Cuenta_3,
-        Nombre_1,
-        Nombre_2,
-        Nombre_3,
-        Opcion_de_Titulacion,
-        Titulo,
-        Fecha_del_Trabajo,
-        Color,
-        imagen
+        N_Impreso_Digital, Carrera, N_Cuenta_1, N_Cuenta_2, N_Cuenta_3, Nombre_1, Nombre_2, Nombre_3, Opcion_de_Titulacion, Titulo, Fecha_del_Trabajo, Color, imagen
     ];
 
     conexion.query(query, values, (err, result) => {
@@ -91,59 +73,19 @@ const createRegistro = (req, res) => {
 };
 
 const updateRegistro = (req, res) => {
+    // Misma lógica que en create: si se sube un nuevo archivo, actualizamos la ruta
+    if (req.file) {
+        req.body.imagen = `/uploads/${req.file.filename}`;
+    }
+    
     const id = req.params.id;
-    const {
-        N_Impreso_Digital,
-        Carrera,
-        N_Cuenta_1,
-        N_Cuenta_2,
-        N_Cuenta_3,
-        Nombre_1,
-        Nombre_2,
-        Nombre_3,
-        Opcion_de_Titulacion,
-        Titulo,
-        Fecha_del_Trabajo,
-        Color,
-        imagen
-    } = req.body;
+    const fieldsToUpdate = req.body;
 
-    const query = `
-        UPDATE Registros SET
-            N_Impreso_Digital = ?,
-            Carrera = ?,
-            N_Cuenta_1 = ?,
-            N_Cuenta_2 = ?,
-            N_Cuenta_3 = ?,
-            Nombre_1 = ?,
-            Nombre_2 = ?,
-            Nombre_3 = ?,
-            Opcion_de_Titulacion = ?,
-            Titulo = ?,
-            Fecha_del_Trabajo = ?,
-            Color = ?,
-            imagen = ?
-        WHERE N_de_Registro = ?
-    `;
-
-    const values = [
-        N_Impreso_Digital,
-        Carrera,
-        N_Cuenta_1,
-        N_Cuenta_2,
-        N_Cuenta_3,
-        Nombre_1,
-        Nombre_2,
-        Nombre_3,
-        Opcion_de_Titulacion,
-        Titulo,
-        Fecha_del_Trabajo,
-        Color,
-        imagen,
-        id
-    ];
-
-    conexion.query(query, values, (err, result) => {
+    // Si no se envió una imagen nueva, el campo 'imagen' no existirá en el formulario
+    // multipart/form-data. Esta consulta solo actualizará los campos presentes en `fieldsToUpdate`.
+    const query = 'UPDATE Registros SET ? WHERE N_de_Registro = ?';
+    
+    conexion.query(query, [fieldsToUpdate, id], (err, result) => {
         if (err) {
             console.error('Error al actualizar registro:', err);
             return res.status(500).json({ error: 'Error al actualizar registro' });

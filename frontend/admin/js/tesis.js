@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (adminData) {
         // Actualiza el nombre del administrador en la interfaz
         document.querySelector('.user-name').textContent = adminData.username || 'admin4';
-        
+
         setupEventListeners();
         await loadRegistros();
         setupModals();
         setupResponsive();
-        
+
         // Agregar botón de menú para móviles
         if (window.innerWidth <= 992) {
             const mobileToggle = document.createElement('button');
@@ -49,7 +49,7 @@ async function verifyAuth() {
             window.location.href = '/admin/index.html';
             return false;
         }
-        
+
         // Devuelve los datos del administrador
         const adminData = await response.json();
         return adminData;
@@ -132,13 +132,13 @@ function setupEventListeners() {
 
     // Nuevo registro
     document.getElementById('newWorkBtn').addEventListener('click', () => showRegistroModal('create'));
-    
+
     // Toggle sidebar con avatar
     document.getElementById('userAvatar').addEventListener('click', toggleSidebar);
-    
+
     // Toggle sidebar con botón
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-    
+
     // Redimensionamiento
     window.addEventListener('resize', () => {
         setupResponsive();
@@ -150,7 +150,7 @@ function setupEventListeners() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const isMobile = window.innerWidth <= 992;
-    
+
     if (isMobile) {
         sidebar.classList.toggle('show');
     } else {
@@ -163,11 +163,11 @@ function resetFilters() {
     document.getElementById('searchInput').value = '';
     document.getElementById('carreraFilter').value = '';
     document.getElementById('fechaFilter').value = '';
-    
+
     filteredData = [...originalData];
     totalItems = filteredData.length;
     currentPage = 1;
-    
+
     updatePagination();
     displayPage(currentPage);
 }
@@ -175,7 +175,7 @@ function resetFilters() {
 // Configurar modales
 function setupModals() {
     const modals = document.querySelectorAll('.modal');
-    
+
     modals.forEach(modal => {
         const closeBtn = modal.querySelector('.close-modal');
         if (closeBtn) {
@@ -270,9 +270,9 @@ async function loadRegistros() {
         originalData = await response.json();
         filteredData = [...originalData];
         totalItems = filteredData.length;
-        
+
         fillFilters();
-        
+
         updatePagination();
         displayPage(currentPage);
 
@@ -288,10 +288,10 @@ async function loadRegistros() {
 function fillFilters() {
     const carreraFilter = document.getElementById('carreraFilter');
     const fechaFilter = document.getElementById('fechaFilter');
-    
+
     while (carreraFilter.options.length > 1) carreraFilter.remove(1);
     while (fechaFilter.options.length > 1) fechaFilter.remove(1);
-    
+
     const carreras = [...new Set(originalData.map(item => item.Carrera))].filter(Boolean);
     const fechas = [...new Set(originalData.map(item => {
         if (item.Fecha_del_Trabajo) {
@@ -300,14 +300,14 @@ function fillFilters() {
         }
         return null;
     }))].filter(Boolean).sort((a, b) => b - a);
-    
+
     carreras.forEach(carrera => {
         const option = document.createElement('option');
         option.value = carrera;
         option.textContent = carrera;
         carreraFilter.appendChild(option);
     });
-    
+
     fechas.forEach(fecha => {
         const option = document.createElement('option');
         option.value = fecha;
@@ -514,14 +514,14 @@ function displayCards(data) {
     data.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card';
-        
+
         card.innerHTML = `
             <div class="card-edit-btn" onclick="event.stopPropagation(); editRegistro(${item.N_de_Registro})" title="Editar">
                 <i class="fas fa-edit"></i>
             </div>
             
-            ${item.imagen ? `<img src="${item.imagen}" class="card-image" alt="Trabajo">` : 
-              '<div class="card-no-image"><i class="fas fa-image"></i></div>'}
+            ${item.imagen ? `<img src="${item.imagen}" class="card-image" alt="Trabajo">` :
+                '<div class="card-no-image"><i class="fas fa-image"></i></div>'}
             
             <div class="card-header">
                 <h3 class="card-title">${item.Titulo || 'Sin título'}</h3>
@@ -726,14 +726,18 @@ function showRegistroModal(mode = 'create', registroData = null) {
     const form = document.getElementById('registroForm');
     const title = document.getElementById('modalRegistroTitle');
     const submitBtn = document.getElementById('submitBtn');
-    
+
     form.reset();
-    
+
+    // --- LÍNEA AÑADIDA ---
+    // Limpiamos manualmente el contenedor de la vista previa de la imagen.
+    document.getElementById('imagen-preview-container').innerHTML = '';
+
     if (mode === 'create') {
         title.innerHTML = '<i class="fas fa-plus"></i> Nuevo Trabajo de Titulación';
         submitBtn.textContent = 'Guardar Trabajo';
         document.getElementById('registroId').value = '';
-        
+
         const today = new Date();
         document.getElementById('anioTrabajo').value = today.getFullYear();
     } else if (mode === 'edit' && registroData) {
@@ -741,7 +745,7 @@ function showRegistroModal(mode = 'create', registroData = null) {
         submitBtn.textContent = 'Actualizar Trabajo';
         populateForm(registroData);
     }
-    
+
     modal.style.display = 'block';
 }
 
@@ -750,8 +754,7 @@ function populateForm(data) {
     document.getElementById('registroId').value = data.N_de_Registro || '';
     document.getElementById('nImpresoDigital').value = data.N_Impreso_Digital || '';
     document.getElementById('titulo').value = data.Titulo || '';
-    document.getElementById('imagen').value = data.imagen || '';
-    
+
     if (data.Carrera) {
         const carreraSelect = document.getElementById('carrera');
         for (let i = 0; i < carreraSelect.options.length; i++) {
@@ -761,7 +764,7 @@ function populateForm(data) {
             }
         }
     }
-    
+
     if (data.Opcion_de_Titulacion) {
         const opcionSelect = document.getElementById('opcionTitulacion');
         for (let i = 0; i < opcionSelect.options.length; i++) {
@@ -771,7 +774,7 @@ function populateForm(data) {
             }
         }
     }
-    
+
     if (data.Color) {
         const colorSelect = document.getElementById('color');
         for (let i = 0; i < colorSelect.options.length; i++) {
@@ -781,7 +784,7 @@ function populateForm(data) {
             }
         }
     }
-    
+
     if (data.Fecha_del_Trabajo) {
         const [mesTexto, , anio] = data.Fecha_del_Trabajo.split(' ');
         const meses = {
@@ -789,23 +792,35 @@ function populateForm(data) {
             'MAYO': '05', 'JUNIO': '06', 'JULIO': '07', 'AGOSTO': '08',
             'SEPTIEMBRE': '09', 'OCTUBRE': '10', 'NOVIEMBRE': '11', 'DICIEMBRE': '12'
         };
-        
+
         if (mesTexto && meses[mesTexto]) {
             const mesSelect = document.getElementById('mesTrabajo');
             mesSelect.value = meses[mesTexto];
         }
-        
+
         if (anio) {
             document.getElementById('anioTrabajo').value = anio;
         }
     }
-    
+
     document.getElementById('nombre1').value = data.Nombre_1 || '';
     document.getElementById('cuenta1').value = data.N_Cuenta_1 || '';
     document.getElementById('nombre2').value = data.Nombre_2 || '';
     document.getElementById('cuenta2').value = data.N_Cuenta_2 || '';
     document.getElementById('nombre3').value = data.Nombre_3 || '';
     document.getElementById('cuenta3').value = data.N_Cuenta_3 || '';
+
+    // --- SECCIÓN NUEVA PARA VISTA PREVIA DE IMAGEN ---
+    const previewContainer = document.getElementById('imagen-preview-container');
+    previewContainer.innerHTML = ''; // Limpiar la vista previa anterior
+
+    if (data.imagen) { // Si el registro tiene una imagen guardada
+        previewContainer.innerHTML = `
+            <p style="font-size: 14px; margin-bottom: 5px;">Imagen actual:</p>
+            <img src="http://localhost:3000${data.imagen}" alt="Imagen actual" style="max-width: 150px; max-height: 100px; border-radius: 5px; border: 1px solid #ddd;">
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">Seleccione un nuevo archivo para reemplazarla.</p>
+        `;
+    }
 }
 
 // Función para cerrar el modal
@@ -817,19 +832,19 @@ function closeRegistroModal() {
 async function editRegistro(registroId) {
     try {
         showLoading();
-        
+
         const token = localStorage.getItem('adminToken');
         const response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (!response.ok) {
             throw new Error(`Error al cargar registro: ${response.status} ${response.statusText}`);
         }
-        
+
         const registroData = await response.json();
         showRegistroModal('edit', registroData);
-        
+
     } catch (error) {
         console.error('Error al editar registro:', error);
         alert(`Error al cargar el registro para editar: ${error.message}`);
@@ -845,57 +860,53 @@ function setupRegistroForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Lógica para combinar mes y año
         const mes = document.getElementById('mesTrabajo').value;
         const anio = document.getElementById('anioTrabajo').value;
-
-        if (!mes || !anio) {
-            alert('Seleccione mes y año válidos');
-            return;
+        if (mes && anio) {
+            const meses = { '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL', '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO', '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE' };
+            document.getElementById('fechaTrabajo').value = `${meses[mes]} DE ${anio}`;
         }
-
-        const meses = {
-            '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL',
-            '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO',
-            '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE'
-        };
-
-        const fechaTexto = `${meses[mes]} DE ${anio}`;
-        document.getElementById('fechaTrabajo').value = fechaTexto;
-
+        
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        const registroId = document.getElementById('registroId').value;
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Eliminamos los campos 'mes' y 'anio' porque no existen en la base de datos
+        formData.delete('mes');
+        formData.delete('anio');
+        // --- FIN DE LA CORRECCIÓN ---
+
+        const registroId = formData.get('N_de_Registro');
+        const token = localStorage.getItem('adminToken');
+
+        let url = 'http://localhost:3000/api/registros/admin';
+        let method = 'POST';
+
+        if (registroId) {
+            url += `/${registroId}`;
+            method = 'PUT';
+        }
 
         try {
             showLoading();
-            const token = localStorage.getItem('adminToken');
-            
-            let response;
-            if (registroId) {
-                response = await fetch(`http://localhost:3000/api/registros/admin/${registroId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-                });
-            } else {
-                response = await fetch('http://localhost:3000/api/registros/admin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-                });
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                // Usamos errorData.error que es lo que tu backend parece enviar
+                throw new Error(errorData.error || (registroId ? 'Error al actualizar registro' : 'Error al crear registro'));
             }
 
-            if (!response.ok) throw new Error(registroId ? 'Error al actualizar registro' : 'Error al crear registro');
-            
             closeRegistroModal();
             await loadRegistros();
-            
+
             alert(registroId ? 'Registro actualizado correctamente' : 'Registro creado correctamente');
 
         } catch (error) {
@@ -910,11 +921,11 @@ function setupRegistroForm() {
 // Actualizar paginación
 function updatePagination() {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
+
     document.getElementById('firstPage').disabled = currentPage === 1;
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
     document.getElementById('lastPage').disabled = currentPage === totalPages || totalPages === 0;
-    
+
     updatePageNumbers(currentPage);
 }
