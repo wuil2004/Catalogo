@@ -733,6 +733,10 @@ function showRegistroModal(mode = 'create', registroData = null) {
     // Limpiamos manualmente el contenedor de la vista previa de la imagen.
     document.getElementById('imagen-preview-container').innerHTML = '';
 
+    // --- LÍNEA AÑADIDA ---
+    // Reiniciamos la bandera de eliminación de imagen
+    document.getElementById('deleteImageFlag').value = '0';
+
     if (mode === 'create') {
         title.innerHTML = '<i class="fas fa-plus"></i> Nuevo Trabajo de Titulación';
         submitBtn.textContent = 'Guardar Trabajo';
@@ -813,13 +817,31 @@ function populateForm(data) {
     // --- SECCIÓN NUEVA PARA VISTA PREVIA DE IMAGEN ---
     const previewContainer = document.getElementById('imagen-preview-container');
     previewContainer.innerHTML = ''; // Limpiar la vista previa anterior
+    previewContainer.style.display = 'block';
 
-    if (data.imagen) { // Si el registro tiene una imagen guardada
+    if (data.imagen) {
         previewContainer.innerHTML = `
-            <p style="font-size: 14px; margin-bottom: 5px;">Imagen actual:</p>
-            <img src="http://localhost:3000${data.imagen}" alt="Imagen actual" style="max-width: 150px; max-height: 100px; border-radius: 5px; border: 1px solid #ddd;">
-            <p style="font-size: 12px; color: #666; margin-top: 5px;">Seleccione un nuevo archivo para reemplazarla.</p>
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div>
+                    <p style="font-size: 14px; margin: 0 0 5px 0;">Imagen actual:</p>
+                    <img src="http://localhost:3000${data.imagen}" alt="Imagen actual" style="max-width: 150px; max-height: 100px; border-radius: 5px; border: 1px solid #ddd;">
+                </div>
+                <div>
+                    <button type="button" id="deleteImageBtn" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">Seleccione un nuevo archivo para reemplazarla.</p>
         `;
+
+        // --- LÓGICA DEL BOTÓN AÑADIDA ---
+        document.getElementById('deleteImageBtn').addEventListener('click', () => {
+            // 1. Ocultar la vista previa
+            previewContainer.style.display = 'none';
+            // 2. Levantar la bandera para que el backend sepa que debe borrar la imagen
+            document.getElementById('deleteImageFlag').value = '1';
+        });
     }
 }
 
@@ -867,9 +889,9 @@ function setupRegistroForm() {
             const meses = { '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL', '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO', '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE' };
             document.getElementById('fechaTrabajo').value = `${meses[mes]} DE ${anio}`;
         }
-        
+
         const formData = new FormData(form);
-        
+
         // --- INICIO DE LA CORRECCIÓN ---
         // Eliminamos los campos 'mes' y 'anio' porque no existen en la base de datos
         formData.delete('mes');
