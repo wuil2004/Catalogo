@@ -144,6 +144,17 @@ function setupEventListeners() {
         setupResponsive();
         setupResponsiveTable();
     });
+
+    // ===================================================================
+    // ✨ CÓDIGO AÑADIDO PARA EXPORTAR A EXCEL ✨
+    // ===================================================================
+    const exportBtn = document.getElementById('exportBtn');
+    if(exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            // Usamos `filteredData` para exportar los datos que el usuario está viendo (con filtros aplicados)
+            exportarAExcel(filteredData);
+        });
+    }
 }
 
 // Alternar sidebar
@@ -950,4 +961,69 @@ function updatePagination() {
     document.getElementById('lastPage').disabled = currentPage === totalPages || totalPages === 0;
 
     updatePageNumbers(currentPage);
+}
+
+
+
+// ===================================================================
+// ✨ FUNCIÓN AÑADIDA PARA EXPORTAR A EXCEL ✨
+// ===================================================================
+/**
+ * Función para exportar datos a un archivo Excel (.xlsx) usando la librería SheetJS.
+ * @param {Array<Object>} datos - El array de objetos a exportar (ej: filteredData).
+ */
+function exportarAExcel(datos) {
+    if (datos.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    console.log('Exportando los siguientes datos:', datos);
+
+    // 1. Prepara los datos para la hoja de cálculo
+    // Mapeamos los datos a un formato más legible para las columnas de Excel.
+    const datosParaExportar = datos.map(registro => ({
+        'N° Registro': registro.N_de_Registro,
+        'Código': registro.N_Impreso_Digital,
+        'Carrera': registro.Carrera,
+        'Estudiante 1': registro.Nombre_1,
+        'Cuenta 1': registro.N_Cuenta_1,
+        'Estudiante 2': registro.Nombre_2,
+        'Cuenta 2': registro.N_Cuenta_2,
+        'Estudiante 3': registro.Nombre_3,
+        'Cuenta 3': registro.N_Cuenta_3,
+        'Opción de Titulación': registro.Opcion_de_Titulacion,
+        'Título': registro.Titulo,
+        'Fecha': registro.Fecha_del_Trabajo,
+        'Color': registro.Color
+    }));
+
+    // 2. Crea la hoja de cálculo y el libro de trabajo
+    const worksheet = XLSX.utils.json_to_sheet(datosParaExportar);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Trabajos de Titulación');
+
+    // 3. (Opcional) Ajustar el ancho de las columnas para mejor legibilidad
+    const anchosDeColumna = [
+        { wch: 12 }, // N° Registro
+        { wch: 15 }, // Código
+        { wch: 30 }, // Carrera
+        { wch: 40 }, // Estudiante 1
+        { wch: 15 }, // Cuenta 1
+        { wch: 40 }, // Estudiante 2
+        { wch: 15 }, // Cuenta 2
+        { wch: 40 }, // Estudiante 3
+        { wch: 15 }, // Cuenta 3
+        { wch: 45 }, // Opción de Titulación
+        { wch: 80 }, // Título
+        { wch: 20 }, // Fecha
+        { wch: 15 }  // Color
+    ];
+    worksheet['!cols'] = anchosDeColumna;
+
+    // 4. Genera y descarga el archivo Excel
+    // El nombre del archivo incluirá la fecha y hora actual.
+    const fechaActual = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const nombreArchivo = `Reporte_Titulacion_${fechaActual}.xlsx`;
+    XLSX.writeFile(workbook, nombreArchivo);
 }
