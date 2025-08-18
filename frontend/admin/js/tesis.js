@@ -677,16 +677,14 @@ function formatImage(imageUrl) {
 // Obtener código de color
 function getColorCode(colorName) {
     const colors = {
-        'rojo': '#ff0000',
-        'azul': '#0000ff',
-        'verde': '#00ff00',
-        'amarillo': '#ffff00',
-        'negro': '#000000',
-        'blanco': '#ffffff',
-        'gris oxford': '#808080',
-        'cafe': '#964B00',
-        'vino': '#722F37',
-        'gris': '#808080'
+        "NEGRO": "#000000",
+        "AZUL": "#002147",
+        "VERDE": "#014421",
+        "GRIS OXFORD": "#2F4F4F",
+        "CAFE": "#4B3621",
+        "VINO": "#4B0014",
+        "ROJO": "#8B0000",
+        "GRIS": "#3A3A3A"
     };
     return colors[colorName?.toLowerCase()] || '#cccccc';
 }
