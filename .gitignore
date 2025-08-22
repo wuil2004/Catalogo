@@ -1,6 +1,7 @@
 # Node
 backend/node_modules/
 backend/uploads/
+backend/backups/
 
 # Logs
 *.log
