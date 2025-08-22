@@ -5,6 +5,7 @@ const path = require('path');
 const multer = require('multer'); // <--- 1. IMPORTAR MULTER
 const conexion = require('./conexion');
 const { authenticateToken } = require('./middleware/authMiddleware');
+const { createDailyBackup } = require('./middleware/backupMiddleware'); // Importar el middleware de backup
 const adminController = require('./controllers/adminController');
 const registrosController = require ('./controllers/registrosController')
 
@@ -50,6 +51,8 @@ app.get('/api/admins/verify-token', authenticateToken, (req, res) => {
     res.json({ valid: true });
 });
 
+app.get('/api/registros',registrosController.getAllRegistros);
+
 // API pública
 app.get('/api/registros', (req, res) => {
     conexion.query('SELECT * FROM Registros', (err, resultados) => {
@@ -87,8 +90,8 @@ app.get('/api/registros/admin/:id', authenticateToken, registrosController.getRe
 app.delete('/api/registros/admin/:id', authenticateToken, registrosController.deleteRegistro);
 
 // 4. AÑADIR EL MIDDLEWARE DE MULTER A LAS RUTAS POST Y PUT
-app.post('/api/registros/admin', authenticateToken, upload.single('imagen'), registrosController.createRegistro);
-app.put('/api/registros/admin/:id', authenticateToken, upload.single('imagen'), registrosController.updateRegistro);
+app.post('/api/registros/admin', authenticateToken, createDailyBackup, upload.single('imagen'), registrosController.createRegistro);
+app.put('/api/registros/admin/:id', authenticateToken, createDailyBackup, upload.single('imagen'), registrosController.updateRegistro);
 
 // Manejo de errores
 app.use((req, res) => {

@@ -1,19 +1,25 @@
 const mysql = require('mysql2');
 
-const conexion = mysql.createConnection({
-  host: 'localhost',      // Conexión a localhost, ya que estás corriendo Node.js en tu máquina local
-  user: 'root',           // Usuario de la base de datos
-  password: 'root123',    // Contraseña de la base de datos
-  database: 'catalogo_pro', // Nombre de la base de datos
-  port: 3307              // Usa el puerto mapeado desde Docker (3307)
-});
+// Objeto de configuración que podemos exportar
+const dbConfig = {
+  host: 'localhost',
+  user: 'root',
+  password: 'root123',
+  database: 'catalogo_pro',
+  port: 3307
+};
+
+const conexion = mysql.createConnection(dbConfig);
 
 conexion.connect((err) => {
   if (err) {
     console.error('Error al conectar con la base de datos:', err);
   } else {
-    console.log('Conexión exitosa');
+    console.log('Conexión exitosa a la base de datos.');
   }
 });
 
+// Exportamos la conexión para que la usen los controladores
 module.exports = conexion;
+// Exportamos la configuración para que la use el sistema de backups
+module.exports.dbConfig = dbConfig;
