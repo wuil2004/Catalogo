@@ -1,3 +1,6 @@
+// Variable global para guardar la fecha de carga de la página
+let pageLoadTimestamp = new Date();
+
 // Variables globales
 let currentPage = 1;
 let itemsPerPage = 10;
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadRegistros();
         setupModals();
         setupResponsive();
+        setupRestoreFeature();
 
         // Agregar botón de menú para móviles
         if (window.innerWidth <= 992) {
@@ -891,6 +895,26 @@ function setupRegistroForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // --- 1. CHEQUEO DE SEGURIDAD ANTES DE GUARDAR ---
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch('http://localhost:3000/api/backups/latest-restore', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!response.ok) throw new Error('Fallo al verificar el servidor');
+            
+            const data = await response.json();
+            
+            // Compara si hubo una restauración DESPUÉS de que la página se cargó
+            if (data.lastRestore && new Date(data.lastRestore) > pageLoadTimestamp) {
+                alert("¡ATENCIÓN!\n\nLa base de datos ha sido restaurada desde que cargaste esta página.\n\nPara evitar conflictos, tus cambios no se guardarán. Por favor, recarga la página.");
+                location.reload(); 
+                return; // Detiene el proceso de guardado
+            }
+        } catch (checkError) {
+            console.error("Error al verificar datos obsoletos:", checkError);
+            alert("No se pudo verificar el estado de la base de datos. Inténtalo de nuevo.");
+            return;
+        }
+
         // Lógica para combinar mes y año
         const mes = document.getElementById('mesTrabajo').value;
         const anio = document.getElementById('anioTrabajo').value;
@@ -961,7 +985,86 @@ function updatePagination() {
     updatePageNumbers(currentPage);
 }
 
+// --- NUEVAS FUNCIONES PARA LA RESTAURACIÓN (PEGAR AL FINAL DEL ARCHIVO) ---
 
+function setupRestoreFeature() {
+    loadBackups(); // Carga la lista de backups al iniciar
+    
+    const restoreBtn = document.getElementById('restoreBtn');
+    const modal = document.getElementById('restoreConfirmModal');
+    const closeModalBtn = modal.querySelector('.close-modal');
+    const cancelBtn = document.getElementById('cancelRestoreBtn');
+    const confirmInput = document.getElementById('confirmInput');
+    const confirmBtn = document.getElementById('confirmRestoreBtn');
+
+    restoreBtn.addEventListener('click', () => {
+        if (document.getElementById('backupSelector').value) {
+            modal.style.display = 'block';
+        } else {
+            alert('Por favor, selecciona una copia de seguridad de la lista.');
+        }
+    });
+
+    const closeModal = () => {
+        modal.style.display = 'none';
+        confirmInput.value = '';
+        confirmBtn.disabled = true;
+    };
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+
+    confirmInput.addEventListener('input', () => {
+        confirmBtn.disabled = confirmInput.value.trim() !== 'RESTAURAR';
+    });
+
+    confirmBtn.addEventListener('click', async () => {
+        const filename = document.getElementById('backupSelector').value;
+        const token = localStorage.getItem('adminToken');
+        showLoading();
+        try {
+            const response = await fetch('http://localhost:3000/api/backups/restore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ filename })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Ocurrió un error en el servidor.');
+            
+            alert(result.message);
+            closeModal();
+            location.reload(); // Recargar la página para ver los datos restaurados
+        } catch (error) {
+            alert(`Error al restaurar: ${error.message}`);
+        } finally {
+            hideLoading();
+        }
+    });
+}
+
+async function loadBackups() {
+    const select = document.getElementById('backupSelector');
+    const restoreBtn = document.getElementById('restoreBtn');
+    const token = localStorage.getItem('adminToken');
+    try {
+        const response = await fetch('http://localhost:3000/api/backups', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!response.ok) throw new Error('No se pudo cargar la lista de backups.');
+        
+        const backups = await response.json();
+        select.innerHTML = '';
+        if (backups.length === 0) {
+            select.innerHTML = '<option value="">No hay backups disponibles</option>';
+            restoreBtn.disabled = true;
+        } else {
+            backups.forEach(file => select.add(new Option(file, file)));
+            restoreBtn.disabled = false;
+        }
+    } catch (error) {
+        select.innerHTML = `<option value="">${error.message}</option>`;
+        restoreBtn.disabled = true;
+    }
+}
 
 // ===================================================================
 // ✨ FUNCIÓN AÑADIDA PARA EXPORTAR A EXCEL ✨

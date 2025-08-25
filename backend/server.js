@@ -7,7 +7,8 @@ const conexion = require('./conexion');
 const { authenticateToken } = require('./middleware/authMiddleware');
 const { createDailyBackup } = require('./middleware/backupMiddleware'); // Importar el middleware de backup
 const adminController = require('./controllers/adminController');
-const registrosController = require ('./controllers/registrosController')
+const registrosController = require ('./controllers/registrosController');
+const backupController = require('./controllers/backupController');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -92,6 +93,12 @@ app.delete('/api/registros/admin/:id', authenticateToken, registrosController.de
 // 4. AÑADIR EL MIDDLEWARE DE MULTER A LAS RUTAS POST Y PUT
 app.post('/api/registros/admin', authenticateToken, createDailyBackup, upload.single('imagen'), registrosController.createRegistro);
 app.put('/api/registros/admin/:id', authenticateToken, createDailyBackup, upload.single('imagen'), registrosController.updateRegistro);
+
+// --- NUEVAS RUTAS PARA RESTAURACIÓN Y CHEQUEO ---
+app.get('/api/backups', authenticateToken, backupController.listBackups);
+app.post('/api/backups/restore', authenticateToken, backupController.restoreBackup);
+app.get('/api/backups/latest-restore', authenticateToken, backupController.getLatestRestoreTimestamp);
+
 
 // Manejo de errores
 app.use((req, res) => {
