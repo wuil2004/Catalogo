@@ -1020,3 +1020,72 @@ td {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+
+/* ===== ESTILOS PARA LA ZONA DE PELIGRO DESPLEGABLE ===== */
+
+/* 1. Estilo para el nuevo botón de advertencia */
+.btn-warning {
+    background-color: var(--primary-color);
+    color: rgb(246, 242, 242);
+}
+
+.btn-warning:hover {
+    background-color: #d80a0a; /* Un tono más oscuro de naranja */
+}
+
+/* 2. Estilos para el contenedor de la Zona de Peligro */
+.danger-zone-container {
+    background-color: #fff6f5; /* Fondo rosa muy pálido */
+    border: 1px solid #e74c3c; /* Borde rojo */
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    
+    /* Lógica para ocultarlo con animación */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    transition: all 0.4s ease-in-out;
+}
+
+/* 3. Clase 'show' que se añadirá con JS para mostrar el panel */
+.danger-zone-container.show {
+    max-height: 500px; /* Altura suficiente para el contenido */
+    opacity: 1;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+/* 4. Estilos para los controles dentro del panel */
+.danger-zone-container h3 {
+    margin-top: 0;
+    color: var(--danger-color);
+}
+
+.danger-zone-container p strong {
+    font-weight: 700;
+}
+
+.restore-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+.btn-danger:disabled {
+    background-color: #f5b7b1;
+    cursor: not-allowed;
+}

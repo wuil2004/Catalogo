@@ -159,6 +159,30 @@ function setupEventListeners() {
             exportarAExcel(filteredData);
         });
     }
+
+    // ===== CÓDIGO NUEVO PARA EL BOTÓN DE ZONA DE PELIGRO =====
+    const toggleDangerZoneBtn = document.getElementById('toggleDangerZoneBtn');
+    const dangerZoneContainer = document.querySelector('.danger-zone-container');
+
+    if(toggleDangerZoneBtn && dangerZoneContainer) {
+        toggleDangerZoneBtn.addEventListener('click', () => {
+            // Alterna la clase 'show' para mostrar u ocultar el panel
+            dangerZoneContainer.classList.toggle('show');
+
+            // Opcional: Cambia el texto y el color del botón
+            const isShown = dangerZoneContainer.classList.contains('show');
+            if (isShown) {
+                toggleDangerZoneBtn.innerHTML = '<i class="fas fa-times"></i> Ocultar Zona de Peligro';
+                toggleDangerZoneBtn.classList.remove('btn-warning');
+                toggleDangerZoneBtn.classList.add('btn-secondary');
+            } else {
+                toggleDangerZoneBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Zona de Peligro';
+                toggleDangerZoneBtn.classList.add('btn-warning');
+                toggleDangerZoneBtn.classList.remove('btn-secondary');
+            }
+        });
+    }
+
 }
 
 // Alternar sidebar

@@ -46,6 +46,11 @@
             <div class="page-header">
                 <h1><i class="fas fa-graduation-cap"></i> Trabajos de Titulación</h1>
                 <div class="page-actions">
+
+                    <button class="btn btn-warning" id="toggleDangerZoneBtn">
+                        <i class="fas fa-exclamation-triangle"></i> Zona de Peligro
+                    </button>
+
                     <div class="view-toggle">
                         <button id="tableViewBtn" class="active" title="Vista de tabla">
                             <i class="fas fa-table"></i>
@@ -88,19 +93,23 @@
                     <i class="fas fa-undo"></i> Limpiar
                 </button>
             </div>
-<!--
+
             <div class="danger-zone-container">
                 <h3><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</h3>
-                <p>Restaurar una copia de seguridad reemplazará TODOS los datos actuales con los datos del archivo. Esta acción no se puede deshacer.</p>
+                <p>Restaurar una copia de seguridad reemplazará TODOS los datos actuales con los datos del archivo. Esta
+                    acción no se puede deshacer.</p>
                 <div class="restore-controls">
                     <div class="filter-group">
                         <label for="backupSelector">Seleccionar copia de seguridad:</label>
-                        <select id="backupSelector"><option value="">Cargando...</option></select>
+                        <select id="backupSelector">
+                            <option value="">Cargando...</option>
+                        </select>
                     </div>
-                    <button class="btn btn-danger" id="restoreBtn" disabled><i class="fas fa-history"></i> Restaurar</button>
+                    <button class="btn btn-danger" id="restoreBtn" disabled><i class="fas fa-history"></i>
+                        Restaurar</button>
                 </div>
             </div>
--->
+
             <!-- Vista de tabla -->
             <div class="registros-container">
                 <div class="table-responsive">
@@ -180,21 +189,25 @@
             </div>
         </main>
     </div>
-<!--
+
     <div id="restoreConfirmModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <span class="close-modal">&times;</span>
-            <h3 class="modal-title" style="color: #d9534f;"><i class="fas fa-exclamation-triangle"></i> Confirmación Requerida</h3>
-            <p>Estás a punto de <strong>sobrescribir toda la base de datos</strong>. Se perderán los cambios realizados después de la fecha del backup.</p>
+            <h3 class="modal-title" style="color: #d9534f;"><i class="fas fa-exclamation-triangle"></i> Confirmación
+                Requerida</h3>
+            <p>Estás a punto de <strong>sobrescribir toda la base de datos</strong>. Se perderán los cambios realizados
+                después de la fecha del backup.</p>
             <p>Para confirmar, escribe <strong>RESTAURAR</strong> en el campo:</p>
-            <input type="text" id="confirmInput" placeholder="Escribe para confirmar..." autocomplete="off" style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="text" id="confirmInput" placeholder="Escribe para confirmar..." autocomplete="off"
+                style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px;">
             <div class="form-actions">
                 <button type="button" class="btn btn-outline" id="cancelRestoreBtn">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="confirmRestoreBtn" disabled>Confirmar Restauración</button>
+                <button type="button" class="btn btn-danger" id="confirmRestoreBtn" disabled>Confirmar
+                    Restauración</button>
             </div>
         </div>
     </div>
--->
+
     <!-- Modal para texto completo -->
     <div id="textModal" class="modal">
         <div class="modal-content">
