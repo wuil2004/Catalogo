@@ -19,10 +19,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // Necesario para procesar f
 // ---- 2. CONFIGURACIÓN DE MULTER ----
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'uploads/')); // Carpeta donde se guardan las imágenes
+    cb(null, path.join(__dirname, 'uploads/'));
   },
   filename: function (req, file, cb) {
-    // Nombre de archivo único para evitar colisiones
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
