@@ -1,6 +1,26 @@
 const conexion = require('../conexion');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2; // <--- 1. Importamos cloudinary
+
+// --- FUNCIÓN HELPER PARA BORRAR EN CLOUDINARY ---
+const borrarImagenCloudinary = async (imageUrl) => {
+    if (imageUrl && imageUrl.includes('cloudinary')) {
+        try {
+            // Extraemos el "Public ID" de la URL
+            // Ejemplo URL: https://res.cloudinary.com/.../upload/v12345/tesis_tesji/mifoto.jpg
+            const parts = imageUrl.split('/');
+            const uploadIndex = parts.indexOf('upload');
+            // Tomamos lo que está después de "upload/" y "v12345/" y le quitamos el ".jpg"
+            const publicIdConExtension = parts.slice(uploadIndex + 2).join('/');
+            const publicId = publicIdConExtension.split('.')[0]; 
+            
+            // Le decimos a Cloudinary que la destruya
+            await cloudinary.uploader.destroy(publicId);
+            console.log('Imagen eliminada de la nube:', publicId);
+        } catch (error) {
+            console.error('Error al borrar imagen en Cloudinary:', error);
+        }
+    }
+};
 
 const getAllRegistros = (req, res) => {
     const query = 'SELECT * FROM Registros';
@@ -29,27 +49,14 @@ const getRegistroById = (req, res) => {
 };
 
 const createRegistro = (req, res) => {
-    // Si multer procesó un archivo, su información estará en req.file
     if (req.file) {
-        // Creamos la ruta de acceso web y la añadimos al cuerpo de la petición
-        req.body.imagen = `/uploads/${req.file.filename}`;
+        req.body.imagen = req.file.path; 
     }
 
-    // El resto del código funciona igual, ya que req.body ahora tiene el campo 'imagen'
     const {
-        N_Impreso_Digital,
-        Carrera,
-        N_Cuenta_1,
-        N_Cuenta_2,
-        N_Cuenta_3,
-        Nombre_1,
-        Nombre_2,
-        Nombre_3,
-        Opcion_de_Titulacion,
-        Titulo,
-        Fecha_del_Trabajo,
-        Color,
-        imagen
+        N_Impreso_Digital, Carrera, N_Cuenta_1, N_Cuenta_2, N_Cuenta_3, 
+        Nombre_1, Nombre_2, Nombre_3, Opcion_de_Titulacion, Titulo, 
+        Fecha_del_Trabajo, Color, imagen
     } = req.body;
 
     const query = `
@@ -74,13 +81,11 @@ const createRegistro = (req, res) => {
     });
 };
 
-// --- 2. FUNCIÓN updateRegistro COMPLETAMENTE ACTUALIZADA ---
 const updateRegistro = (req, res) => {
     const id = req.params.id;
     const newData = req.body;
 
-    // Primero, obtenemos la ruta de la imagen actual desde la base de datos
-    conexion.query('SELECT imagen FROM Registros WHERE N_de_Registro = ?', [id], (err, results) => {
+    conexion.query('SELECT imagen FROM Registros WHERE N_de_Registro = ?', [id], async (err, results) => {
         if (err) {
             console.error('Error al obtener registro para actualizar:', err);
             return res.status(500).json({ error: 'Error interno del servidor' });
@@ -90,36 +95,22 @@ const updateRegistro = (req, res) => {
         }
 
         const oldImagePath = results[0].imagen;
-        let finalImagePath = oldImagePath; // Por defecto, mantenemos la imagen antigua
+        let finalImagePath = oldImagePath; 
 
-        // CASO 1: Se sube un archivo nuevo (reemplazar)
+        // CASO 1: Se sube un archivo nuevo (borramos el viejo de la nube)
         if (req.file) {
-            finalImagePath = `/uploads/${req.file.filename}`;
-            // Si había una imagen antigua, la borramos del servidor
-            if (oldImagePath) {
-                const fullPath = path.join(__dirname, '..', oldImagePath); // Ej: backend/uploads/imagen.jpg
-                fs.unlink(fullPath, (unlinkErr) => {
-                    if (unlinkErr) console.error("Error al borrar el archivo antiguo:", unlinkErr);
-                });
-            }
+            finalImagePath = req.file.path; 
+            await borrarImagenCloudinary(oldImagePath); // <--- Llama a borrar
         } 
-        // CASO 2: Se marcó la bandera para eliminar la imagen
+        // CASO 2: Se marcó la bandera para eliminar la imagen (borramos el viejo de la nube)
         else if (newData.deleteImage === '1') {
-            finalImagePath = null; // La nueva ruta en la BD será NULL
-            // Si había una imagen, la borramos del servidor
-            if (oldImagePath) {
-                const fullPath = path.join(__dirname, '..', oldImagePath);
-                fs.unlink(fullPath, (unlinkErr) => {
-                    if (unlinkErr) console.error("Error al borrar el archivo:", unlinkErr);
-                });
-            }
+            finalImagePath = null; 
+            await borrarImagenCloudinary(oldImagePath); // <--- Llama a borrar
         }
 
-        // Preparamos los datos finales para la actualización
         newData.imagen = finalImagePath;
-        delete newData.deleteImage; // Borramos la bandera, no es una columna de la BD
+        delete newData.deleteImage; 
 
-        // Procedemos a actualizar la base de datos
         const query = 'UPDATE Registros SET ? WHERE N_de_Registro = ?';
         conexion.query(query, [newData, id], (updateErr, updateResult) => {
             if (updateErr) {
@@ -133,17 +124,33 @@ const updateRegistro = (req, res) => {
 
 const deleteRegistro = (req, res) => {
     const id = req.params.id;
-    const query = 'DELETE FROM Registros WHERE N_de_Registro = ?';
-    
-    conexion.query(query, [id], (err, result) => {
+
+    // 1. Primero buscamos el registro para saber si tiene imagen
+    conexion.query('SELECT imagen FROM Registros WHERE N_de_Registro = ?', [id], (err, results) => {
         if (err) {
-            console.error('Error al eliminar registro:', err);
-            return res.status(500).json({ error: 'Error al eliminar registro' });
+            console.error('Error al buscar registro para eliminar:', err);
+            return res.status(500).json({ error: 'Error interno' });
         }
-        if (result.affectedRows === 0) {
+        
+        if (results.length === 0) {
             return res.status(404).json({ error: 'Registro no encontrado' });
         }
-        res.json({ message: 'Registro eliminado exitosamente' });
+
+        const imageUrl = results[0].imagen;
+
+        // 2. Procedemos a eliminarlo de la base de datos
+        const query = 'DELETE FROM Registros WHERE N_de_Registro = ?';
+        conexion.query(query, [id], async (deleteErr, result) => {
+            if (deleteErr) {
+                console.error('Error al eliminar registro:', deleteErr);
+                return res.status(500).json({ error: 'Error al eliminar registro' });
+            }
+            
+            // 3. Si se eliminó de la BD correctamente, borramos la imagen de la nube
+            await borrarImagenCloudinary(imageUrl); // <--- Llama a borrar
+
+            res.json({ message: 'Registro eliminado exitosamente' });
+        });
     });
 };
 

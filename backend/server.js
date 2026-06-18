@@ -1,12 +1,19 @@
+require('dotenv').config(); // <--- 1. CARGAR VARIABLES DE ENTORNO
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const multer = require('multer'); // <--- 1. IMPORTAR MULTER
+const multer = require('multer'); 
+
+// <--- 2. IMPORTAR CLOUDINARY --->
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 const conexion = require('./conexion');
 const { authenticateToken } = require('./middleware/authMiddleware');
 const adminController = require('./controllers/adminController');
-const registrosController = require ('./controllers/registrosController')
+const registrosController = require('./controllers/registrosController');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,22 +23,26 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // Necesario para procesar form-data
 
-// ---- 2. CONFIGURACIÓN DE MULTER ----
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'uploads/'));
+// <--- 3. CONFIGURACIÓN DE CLOUDINARY Y MULTER --->
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'tesis_tesji', // Así se llamará la carpeta en tu nube
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'gif']
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 const upload = multer({ storage: storage });
 
 // ---- RUTAS DE ARCHIVOS ESTÁTICOS ----
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
-// 3. HACER PÚBLICA LA CARPETA 'UPLOADS'
+// Mantenemos esta ruta por si tienes imágenes locales viejas que aún necesiten cargar
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ruta principal para servir el index.html público
@@ -85,7 +96,7 @@ app.get('/api/registros/admin', authenticateToken, registrosController.getAllReg
 app.get('/api/registros/admin/:id', authenticateToken, registrosController.getRegistroById);
 app.delete('/api/registros/admin/:id', authenticateToken, registrosController.deleteRegistro);
 
-// 4. AÑADIR EL MIDDLEWARE DE MULTER A LAS RUTAS POST Y PUT
+// AÑADIR EL MIDDLEWARE DE MULTER A LAS RUTAS POST Y PUT
 app.post('/api/registros/admin', authenticateToken, upload.single('imagen'), registrosController.createRegistro);
 app.put('/api/registros/admin/:id', authenticateToken, upload.single('imagen'), registrosController.updateRegistro);
 

@@ -1,3 +1,4 @@
+// backend/controllers/adminController.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const conexion = require('../conexion');
